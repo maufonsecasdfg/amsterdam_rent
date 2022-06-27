@@ -12,6 +12,7 @@ class Scraper():
     def scrape(self, city, site, max_pages):
         properties = []
         data = {'source': [],
+                'postType': [],
                 'city': [],
                 'postcode': [],
                 'type': [],
@@ -23,60 +24,44 @@ class Scraper():
                 'longitude': []
             }
         if site == 'pararius':
-            base_url = f'https://www.pararius.com/apartments/{city}/'
-            page = 1
-            while page <= max_pages:
-                print(f'Page: {page}')
-                headers = self.generate_headers()
-                response = httpx.get(base_url+f'page-{page}', verify='./consolidate.pem', headers=headers)
-                soup = BeautifulSoup(response.text,'html.parser')
-                page_propts = soup.find_all('li', class_="search-list__item search-list__item--listing")
-
-                if len(page_propts) != 0:
-                    for p in page_propts:
-                        data['source'].append('Pararius')
-                        data['city'].append(city)
-                        data['postcode'].append(p.find('div',class_="listing-search-item__location").get_text().replace('  ','').replace('\n',''))
-                        data['type'].append(p.find('a',class_='listing-search-item__link listing-search-item__link--title').get_text().split(' ')[0])
-                        data['price'].append(p.find('div',class_="listing-search-item__price").get_text().replace('  ','').replace('\n',''))
-                        data['surface'].append(p.find('li',class_="illustrated-features__item illustrated-features__item--surface-area").get_text())
-                        data['rooms'].append(p.find('li',class_="illustrated-features__item illustrated-features__item--number-of-rooms").get_text())
-                        if p.find('li',class_="illustrated-features__item illustrated-features__item--interior") is not None:
-                            data['furnished'].append(p.find('li',class_="illustrated-features__item illustrated-features__item--interior").get_text())
-                        else:
-                            data['furnished'].append(None)
-                        data['latitude'].append(None)
-                        data['longitude'].append(None)
-                    time.sleep(1 + 5*random())
-                    page += 1
+            for postTyp in ['Buy','Rent']:
+                print(f'Post Type: {postTyp}')
+                if postTyp == 'Rent':
+                    base_url = f'https://www.pararius.com/apartments/{city}/'
                 else:
-                    print('Reached final page.')
-                    break
-
-        elif site == 'funda':
-            for typ in ['woonhuis','appartement']:
-                base_url = f'https://www.funda.nl/en/huur/{city}/{typ}/'
+                    base_url = f'https://www.pararius.nl/koopwoningen/{city}/'
                 page = 1
                 while page <= max_pages:
                     print(f'Page: {page}')
                     headers = self.generate_headers()
-                    response = httpx.get(base_url+f'p{page}',verify='./consolidate.pem', headers=headers, follow_redirects=True)
+                    tries = 0
+                    while tries <= 3:
+                        try:
+                            response = httpx.get(base_url+f'page-{page}', verify='./consolidate.pem', headers=headers)
+                            break
+                        except:
+                            tries += 1
+                    if tries == 3:
+                        print('No response, tried 3 times.')
+                        page += 1
+                        continue
                     soup = BeautifulSoup(response.text,'html.parser')
-                    page_propts = soup.find_all('div', class_="search-result-content-inner")
+                    page_propts = soup.find_all('li', class_="search-list__item search-list__item--listing")
 
                     if len(page_propts) != 0:
                         for p in page_propts:
-                            data['source'].append('Funda')
+                            data['source'].append('Pararius')
                             data['city'].append(city)
-                            data['postcode'].append(p.find('h4', class_='search-result__header-subtitle fd-m-none').get_text().replace('\r','').replace('\n','').replace('  ',''))
-                            if typ == 'woonhuis':
-                                data['type'].append('House')
+                            data['postType'].append(postTyp)
+                            data['postcode'].append(p.find('div',class_="listing-search-item__location").get_text().replace('  ','').replace('\n',''))
+                            data['type'].append(p.find('a',class_='listing-search-item__link listing-search-item__link--title').get_text().split(' ')[0])
+                            data['price'].append(p.find('div',class_="listing-search-item__price").get_text().replace('  ','').replace('\n',''))
+                            data['surface'].append(p.find('li',class_="illustrated-features__item illustrated-features__item--surface-area").get_text())
+                            data['rooms'].append(p.find('li',class_="illustrated-features__item illustrated-features__item--number-of-rooms").get_text())
+                            if p.find('li',class_="illustrated-features__item illustrated-features__item--interior") is not None:
+                                data['furnished'].append(p.find('li',class_="illustrated-features__item illustrated-features__item--interior").get_text())
                             else:
-                                data['type'].append('Appartment')
-                            data['price'].append(p.find('span', class_='search-result-price').get_text())
-                            data['surface'].append(p.find('span', title='Living area').get_text())
-                            data['rooms'].append([x for x in p.find_all('li') if 'room' in x.get_text()][0].get_text())
-                            data['furnished'].append(None)
+                                data['furnished'].append(None)
                             data['latitude'].append(None)
                             data['longitude'].append(None)
                         time.sleep(1 + 5*random())
@@ -84,6 +69,62 @@ class Scraper():
                     else:
                         print('Reached final page.')
                         break
+
+        elif site == 'funda':
+            for typ in ['woonhuis','appartement']:
+                print(f'Type: {typ}')
+                for postTyp in ['koop','huur']:
+                    print(f'Post Type: {postTyp}')
+                    base_url = f'https://www.funda.nl/en/{postTyp}/{city}/{typ}/'
+                    page = 1
+                    while page <= max_pages:
+                        print(f'Page: {page}')
+                        headers = self.generate_headers()
+                        tries = 0
+                        while tries <= 3:
+                            try:
+                                response = httpx.get(base_url+f'p{page}',verify='./consolidate.pem', headers=headers, follow_redirects=True)
+                                break
+                            except:
+                                tries += 1
+                        if tries == 3:
+                            print('No response, tried 3 times.')
+                            page += 1
+                            continue
+                        soup = BeautifulSoup(response.text,'html.parser')
+                        page_propts = soup.find_all('div', class_="search-result-content-inner")
+
+                        if len(page_propts) != 0:
+                            for p in page_propts:
+                                data['source'].append('Funda')
+                                data['city'].append(city)
+                                data['postcode'].append(p.find('h4', class_='search-result__header-subtitle fd-m-none').get_text().replace('\r','').replace('\n','').replace('  ',''))
+                                if postTyp == 'huur':
+                                    data['postType'].append('Rent')
+                                else:
+                                    data['postType'].append('Buy')
+                                if typ == 'woonhuis':
+                                    data['type'].append('House')
+                                else:
+                                    data['type'].append('Apartment')
+                                data['price'].append(p.find('span', class_='search-result-price').get_text())
+                                if p.find('span', title='Living area') is not None:
+                                    data['surface'].append(p.find('span', title='Living area').get_text())
+                                else:
+                                    data['surface'].append(None)
+                                r = [x for x in p.find_all('li') if 'room' in x.get_text()]
+                                if len(r) > 0:
+                                    data['rooms'].append(r[0].get_text())
+                                else:
+                                    data['rooms'].append(None)
+                                data['furnished'].append(None)
+                                data['latitude'].append(None)
+                                data['longitude'].append(None)
+                            time.sleep(1 + 5*random())
+                            page += 1
+                        else:
+                            print('Reached final page.')
+                            break
         
         elif site == 'kamernet':
             base_url = f'https://kamernet.nl/en/for-rent/rooms-{city}'
@@ -91,7 +132,17 @@ class Scraper():
             while page <= max_pages:
                 print(f'Page: {page}')
                 headers = self.generate_headers()
-                response = httpx.get(base_url+f'?pageno={page}',verify='./consolidate.pem', headers=headers)
+                tries = 0
+                while tries <= 3:
+                    try:
+                        response = httpx.get(base_url+f'?pageno={page}',verify='./consolidate.pem', headers=headers)
+                        break
+                    except:
+                        tries += 1
+                if tries == 3:
+                    print('No response, tried 3 times.')
+                    page += 1
+                    continue
                 soup = BeautifulSoup(response.text,'html.parser')
                 page_propts = soup.find_all('div', class_="tile-wrapper ka-tile")
 
