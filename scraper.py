@@ -24,85 +24,90 @@ class Scraper():
                 'longitude': []
             }
         if site == 'pararius':
-            if postType == 'Rent':
-                base_url = f'https://www.pararius.com/apartments/{city}/'
-            elif postType == 'Buy':
-                base_url = f'https://www.pararius.nl/koopwoningen/{city}/'
-            page = 1
-            while page <= max_pages:
-                print(f'            Page: {page}')
-                headers = self.generate_headers()
-                tries = 0
-                while tries <= 3:
-                    try:
-                        response = httpx.get(base_url+f'page-{page}', verify='./consolidate.pem', headers=headers)
+            for typ in ['appartement','huis','studio']:
+                if postType == 'Rent':
+                    print('            Running all for rent')
+                    base_url = f'https://www.pararius.com/apartments/{city}/'
+                elif postType == 'Buy':
+                    print(f'            Running property type: {typ}')
+                    base_url = f'https://www.pararius.nl/koopwoningen/{city}/{typ}/'
+                page = 1
+                while page <= max_pages:
+                    print(f'            Page: {page}')
+                    headers = self.generate_headers()
+                    tries = 0
+                    while tries <= 3:
+                        try:
+                            response = httpx.get(base_url+f'page-{page}', verify='./consolidate.pem', headers=headers)
+                            break
+                        except:
+                            tries += 1
+                    if tries == 3:
+                        print(            'No response, tried 3 times.')
+                        page += 1
+                        continue
+                    soup = BeautifulSoup(response.text,'html.parser')
+                    page_propts = soup.find_all('li', class_="search-list__item search-list__item--listing")
+
+                    if len(page_propts) != 0:
+                        data = {'source': [],
+                            'postType': [],
+                            'city': [],
+                            'postcode': [],
+                            'type': [],
+                            'price': [],
+                            'surface': [],
+                            'rooms': [],
+                            'furnished': [],
+                            'latitude': [],
+                            'longitude': []
+                        }
+                        for p in page_propts:
+                            data['source'].append('Pararius')
+                            data['city'].append(city)
+                            data['postType'].append(postType)
+                            pc = p.find('div',class_="listing-search-item__location")
+                            if pc is not None:
+                                data['postcode'].append(pc.get_text().replace('  ','').replace('\n',''))
+                            else:
+                                data['postcode'].append(None)
+                            t = p.find('a',class_='listing-search-item__link listing-search-item__link--title')
+                            if t is not None:
+                                data['type'].append(t.get_text().split(' ')[0])
+                            else:
+                                data['type'].append(None)
+                            pr = p.find('div',class_="listing-search-item__price")
+                            if pr is not None:
+                                data['price'].append(pr.get_text().replace('  ','').replace('\n',''))
+                            else:
+                                data['price'].append(None)
+                            sf = p.find('li',class_="illustrated-features__item illustrated-features__item--surface-area")
+                            if sf is not None:
+                                data['surface'].append(sf.get_text())
+                            else:
+                                data['surface'].append(None)
+                            rm = p.find('li',class_="illustrated-features__item illustrated-features__item--number-of-rooms")
+                            if rm is not None:
+                                data['rooms'].append(rm.get_text())
+                            else:
+                                data['rooms'].append(None)
+                            fr = p.find('li',class_="illustrated-features__item illustrated-features__item--interior")
+                            if fr is not None:
+                                data['furnished'].append(p.find('li',class_="illustrated-features__item illustrated-features__item--interior").get_text())
+                            else:
+                                data['furnished'].append(None)
+                            data['latitude'].append(None)
+                            data['longitude'].append(None)
+
+                        df = pd.DataFrame(data)
+                        self.properties = pd.concat([self.properties,df]).reset_index(drop=True)
+                        time.sleep(1 + 5*random())
+                        page += 1
+                    else:
+                        print('            Reached final page.')
                         break
-                    except:
-                        tries += 1
-                if tries == 3:
-                    print(            'No response, tried 3 times.')
-                    page += 1
-                    continue
-                soup = BeautifulSoup(response.text,'html.parser')
-                page_propts = soup.find_all('li', class_="search-list__item search-list__item--listing")
-
-                if len(page_propts) != 0:
-                    data = {'source': [],
-                        'postType': [],
-                        'city': [],
-                        'postcode': [],
-                        'type': [],
-                        'price': [],
-                        'surface': [],
-                        'rooms': [],
-                        'furnished': [],
-                        'latitude': [],
-                        'longitude': []
-                    }
-                    for p in page_propts:
-                        data['source'].append('Pararius')
-                        data['city'].append(city)
-                        data['postType'].append(postType)
-                        pc = p.find('div',class_="listing-search-item__location")
-                        if pc is not None:
-                            data['postcode'].append(pc.get_text().replace('  ','').replace('\n',''))
-                        else:
-                            data['postcode'].append(None)
-                        t = p.find('a',class_='listing-search-item__link listing-search-item__link--title')
-                        if t is not None:
-                            data['type'].append(t.get_text().split(' ')[0])
-                        else:
-                            data['type'].append(None)
-                        pr = p.find('div',class_="listing-search-item__price")
-                        if pr is not None:
-                            data['price'].append(pr.get_text().replace('  ','').replace('\n',''))
-                        else:
-                            data['price'].append(None)
-                        sf = p.find('li',class_="illustrated-features__item illustrated-features__item--surface-area")
-                        if sf is not None:
-                            data['surface'].append(sf.get_text())
-                        else:
-                            data['surface'].append(None)
-                        rm = p.find('li',class_="illustrated-features__item illustrated-features__item--number-of-rooms")
-                        if rm is not None:
-                            data['rooms'].append(rm.get_text())
-                        else:
-                            data['rooms'].append(None)
-                        fr = p.find('li',class_="illustrated-features__item illustrated-features__item--interior")
-                        if fr is not None:
-                            data['furnished'].append(p.find('li',class_="illustrated-features__item illustrated-features__item--interior").get_text())
-                        else:
-                            data['furnished'].append(None)
-                        data['latitude'].append(None)
-                        data['longitude'].append(None)
-
-                    df = pd.DataFrame(data)
-                    self.properties = pd.concat([self.properties,df]).reset_index(drop=True)
-                    time.sleep(1 + 5*random())
-                    page += 1
-                else:
-                    print('            Reached final page.')
-                    break
+                if postType == 'Rent':
+                    break 
 
         elif site == 'funda':
             for typ in ['woonhuis','appartment']:
@@ -251,8 +256,6 @@ class Scraper():
                 for city in cities:
                     print(f'        Running city: {city}')
                     self.scrape(city, site, postType, max_pages)
-
-
 
     def generate_headers(self):
 
