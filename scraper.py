@@ -11,18 +11,6 @@ class Scraper():
 
     def scrape(self, city, site, postType, max_pages):
         properties = []
-        data = {'source': [],
-                'postType': [],
-                'city': [],
-                'postcode': [],
-                'type': [],
-                'price': [],
-                'surface': [],
-                'rooms': [],
-                'furnished': [],
-                'latitude': [],
-                'longitude': []
-            }
         if site == 'pararius':
             for typ in ['appartement','huis','studio']:
                 if postType == 'Rent':
@@ -36,32 +24,49 @@ class Scraper():
                     print(f'            Page: {page}')
                     headers = self.generate_headers()
                     tries = 0
+                    err = None
                     while tries <= 3:
                         try:
                             response = httpx.get(base_url+f'page-{page}', verify='./consolidate.pem', headers=headers)
+                        except httpx.TimeoutException as errt:
+                            print('                Timeout Error, retrying...')
+                            err = errt
+                            tries += 1
+                            continue
+                        except httpx.ConnectError as errc:
+                            print('                Connection Error, retrying...')
+                            err = errc
+                            tries += 1
+                            continue
+                        if str(response.status_code)[0] == '2':
                             break
-                        except:
+                        else:
                             tries += 1
                     if tries == 3:
-                        print(            'No response, tried 3 times.')
-                        page += 1
-                        continue
+                        if err is None:
+                            print('            Reached final page.')
+                            break
+                        else:
+                            print(f'            Tries exceeded with error: {err}')
+                            page += 1
+                            continue
+
                     soup = BeautifulSoup(response.text,'html.parser')
                     page_propts = soup.find_all('li', class_="search-list__item search-list__item--listing")
 
                     if len(page_propts) != 0:
                         data = {'source': [],
-                            'postType': [],
-                            'city': [],
-                            'postcode': [],
-                            'type': [],
-                            'price': [],
-                            'surface': [],
-                            'rooms': [],
-                            'furnished': [],
-                            'latitude': [],
-                            'longitude': []
-                        }
+                                'postType': [],
+                                'city': [],
+                                'postcode': [],
+                                'type': [],
+                                'price': [],
+                                'surface': [],
+                                'rooms': [],
+                                'furnished': [],
+                                'latitude': [],
+                                'longitude': []
+                            }
                         for p in page_propts:
                             data['source'].append('Pararius')
                             data['city'].append(city)
@@ -106,8 +111,6 @@ class Scraper():
                     else:
                         print('            Reached final page.')
                         break
-                if postType == 'Rent':
-                    break 
 
         elif site == 'funda':
             for typ in ['woonhuis','appartment']:
@@ -122,32 +125,50 @@ class Scraper():
                     print(f'            Page: {page}')
                     headers = self.generate_headers()
                     tries = 0
+                    err = None
                     while tries <= 3:
                         try:
                             response = httpx.get(base_url+f'p{page}',verify='./consolidate.pem', headers=headers, follow_redirects=True)
+                            response.raise_for_status()
+                        except httpx.TimeoutException as errt:
+                            print('                Timeout Error, retrying...')
+                            err = errt
+                            tries += 1
+                            continue
+                        except httpx.ConnectError as errc:
+                            print('                Connection Error, retrying...')
+                            err = errc
+                            tries += 1
+                            continue
+                        if str(response.status_code)[0] == '2':
                             break
-                        except:
+                        else:
                             tries += 1
                     if tries == 3:
-                        print('            No response, tried 3 times.')
-                        page += 1
-                        continue
+                        if err is None:
+                            print('            Reached final page.')
+                            break
+                        else:
+                            print(f'            Tries exceeded with error: {err}')
+                            page += 1
+                            continue
+                   
                     soup = BeautifulSoup(response.text,'html.parser')
                     page_propts = soup.find_all('div', class_="search-result-content-inner")
 
                     if len(page_propts) != 0:
                         data = {'source': [],
-                            'postType': [],
-                            'city': [],
-                            'postcode': [],
-                            'type': [],
-                            'price': [],
-                            'surface': [],
-                            'rooms': [],
-                            'furnished': [],
-                            'latitude': [],
-                            'longitude': []
-                        }
+                                'postType': [],
+                                'city': [],
+                                'postcode': [],
+                                'type': [],
+                                'price': [],
+                                'surface': [],
+                                'rooms': [],
+                                'furnished': [],
+                                'latitude': [],
+                                'longitude': []
+                            }
                         for p in page_propts:
                             data['source'].append('Funda')
                             data['city'].append(city)
@@ -198,33 +219,51 @@ class Scraper():
                     print(f'            Page: {page}')
                     headers = self.generate_headers()
                     tries = 0
+                    err = None
                     while tries <= 3:
                         try:
                             response = httpx.get(base_url+f'?pageno={page}',verify='./consolidate.pem', headers=headers)
+                            response.raise_for_status()
+                        except httpx.TimeoutException as errt:
+                            print('                Timeout Error, retrying...')
+                            err = errt
+                            tries += 1
+                            continue
+                        except httpx.ConnectError as errc:
+                            print('                Connection Error, retrying...')
+                            err = errc
+                            tries += 1
+                            continue
+                        if str(response.status_code)[0] == '2':
                             break
-                        except:
+                        else:
                             tries += 1
                     if tries == 3:
-                        print('            No response, tried 3 times.')
-                        page += 1
-                        continue
+                        if err is None:
+                            print('            Reached final page.')
+                            break
+                        else:
+                            print(f'            Tries exceeded with error: {err}')
+                            page += 1
+                            continue
+
                     soup = BeautifulSoup(response.text,'html.parser')
                     page_propts = soup.find_all('div', class_="tile-wrapper ka-tile")
 
                     if len(page_propts) != 0:
+                        data = {'source': [],
+                                'postType': [],
+                                'city': [],
+                                'postcode': [],
+                                'type': [],
+                                'price': [],
+                                'surface': [],
+                                'rooms': [],
+                                'furnished': [],
+                                'latitude': [],
+                                'longitude': []
+                            }
                         for p in page_propts:
-                            data = {'source': [],
-                                    'postType': [],
-                                    'city': [],
-                                    'postcode': [],
-                                    'type': [],
-                                    'price': [],
-                                    'surface': [],
-                                    'rooms': [],
-                                    'furnished': [],
-                                    'latitude': [],
-                                    'longitude': []
-                                }
                             data['source'].append('Kamernet')
                             data['city'].append(city)
                             data['postType'].append(postType)
