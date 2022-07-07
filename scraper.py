@@ -129,7 +129,6 @@ class Scraper():
                     while tries <= 3:
                         try:
                             response = httpx.get(base_url+f'p{page}',verify='./consolidate.pem', headers=headers, follow_redirects=True)
-                            response.raise_for_status()
                         except httpx.TimeoutException as errt:
                             print('                Timeout Error, retrying...')
                             err = errt
@@ -223,7 +222,6 @@ class Scraper():
                     while tries <= 3:
                         try:
                             response = httpx.get(base_url+f'?pageno={page}',verify='./consolidate.pem', headers=headers)
-                            response.raise_for_status()
                         except httpx.TimeoutException as errt:
                             print('                Timeout Error, retrying...')
                             err = errt
@@ -234,6 +232,8 @@ class Scraper():
                             err = errc
                             tries += 1
                             continue
+                        if str(response.status_code)[0] == '4':
+                            break
                         if str(response.status_code)[0] == '2':
                             break
                         else:
@@ -246,6 +246,9 @@ class Scraper():
                             print(f'            Tries exceeded with error: {err}')
                             page += 1
                             continue
+
+                    if str(response.status_code)[0] == '4':
+                        break
 
                     soup = BeautifulSoup(response.text,'html.parser')
                     page_propts = soup.find_all('div', class_="tile-wrapper ka-tile")

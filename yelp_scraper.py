@@ -69,7 +69,7 @@ class YelpScraper():
     def save_new_bus(self):
         if (list(self.known_bus.columns) == ['id', 'name', 'url', 'review_count', 'rating', 'price', 'latitude','longitude', 'category'] 
             and list(self.new_bus.columns) == ['id', 'name', 'url', 'review_count', 'rating', 'price', 'latitude','longitude', 'category']
-            and list(self.cache.columns) == ['postcode', 'category'])
+            and list(self.cache.columns) == ['postcode', 'category']
             and list(self.New_cache.columns) == ['postcode', 'category']):
             self.known_bus = pd.concat([self.known_bus,self.new_bus]).drop_duplicates().reset_index(drop=True)
             self.known_bus.to_csv('./data/yelp_businesses.csv',index=False)
