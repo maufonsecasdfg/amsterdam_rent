@@ -12,11 +12,13 @@ class YelpScraper():
         self.new_cache = pd.DataFrame()
         self.new_bus = pd.DataFrame()
         self.coords = pd.read_csv('./data/postcode_coordinates.csv')
+        self.latlong_grid = pd.read_csv('./data/latlong_grid.csv')
 
     def get_businesses(self,by='postcode',radius=2000):
         '''
             by: Use either 'postcode' to use complete porstcode (ex: 1014SC) or
-                'reduced_postcode' to use the first 4 numbers instead (ex: 1014)
+                'reduced_postcode' to use the first 4 numbers instead (ex: 1014) or
+                'latlong_grid' to use the latlong_grid.csv containing a latitude,longitude grid.
         '''
         self.headers = {
             'Authorization': f'Bearer {YELP_API_KEY}'
@@ -32,6 +34,11 @@ class YelpScraper():
             lookup = self.coords.copy()
             lookup['postcode'] = lookup['postcode'].str.replace(r'[^0-9]+','',regex=True)
             lookup = lookup.groupby('postcode').mean().reset_index()
+        elif by == 'latlong_grid':
+            lookup = self.latlong_grid.copy()
+            lookup.rename(columns={'resolution':'postcode'},inplace=True)
+            lookup['postcode'] = lookup['latitude'].astype('str')+'_'+lookup['longitude'].astype('str')+'_'+lookup['postcode']
+
         for postcode in tqdm(lookup['postcode']):
             lat = lookup[lookup['postcode']==postcode]['latitude'].values[0]
             lng = lookup[lookup['postcode']==postcode]['longitude'].values[0]
@@ -70,7 +77,7 @@ class YelpScraper():
         if (list(self.known_bus.columns) == ['id', 'name', 'url', 'review_count', 'rating', 'price', 'latitude','longitude', 'category'] 
             and list(self.new_bus.columns) == ['id', 'name', 'url', 'review_count', 'rating', 'price', 'latitude','longitude', 'category']
             and list(self.cache.columns) == ['postcode', 'category']
-            and list(self.New_cache.columns) == ['postcode', 'category']):
+            and list(self.new_cache.columns) == ['postcode', 'category']):
             self.known_bus = pd.concat([self.known_bus,self.new_bus]).drop_duplicates().reset_index(drop=True)
             self.known_bus.to_csv('./data/yelp_businesses.csv',index=False)
             self.cache = pd.concat([self.cache,self.new_cache]).drop_duplicates().reset_index(drop=True)

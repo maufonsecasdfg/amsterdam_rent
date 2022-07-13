@@ -27,7 +27,7 @@ class Scraper():
                     err = None
                     while tries <= 3:
                         try:
-                            response = httpx.get(base_url+f'page-{page}', verify='./consolidate.pem', headers=headers)
+                            response = httpx.get(base_url+f'page-{page}', verify='./consolidate.pem', headers=headers, follow_redirects=True)
                         except httpx.TimeoutException as errt:
                             print('                Timeout Error, retrying...')
                             err = errt
@@ -221,7 +221,7 @@ class Scraper():
                     err = None
                     while tries <= 3:
                         try:
-                            response = httpx.get(base_url+f'?pageno={page}',verify='./consolidate.pem', headers=headers)
+                            response = httpx.get(base_url+f'?pageno={page}',verify='./consolidate.pem', headers=headers, follow_redirects=True)
                         except httpx.TimeoutException as errt:
                             print('                Timeout Error, retrying...')
                             err = errt
