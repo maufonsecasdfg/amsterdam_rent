@@ -17,7 +17,8 @@ class YelpScraper():
         self.geometry = pd.read_csv('./data/citygeometry.csv')
         self.geometry['geometry'] = self.geometry['geometry'].apply(wkt.loads)
         self.geometry = gpd.GeoDataFrame(self.geometry, geometry='geometry').set_crs('EPSG:4326')
-        self.gyelp = gpd.GeoDataFrame(self.known_bus, geometry=gpd.points_from_xy(self.known_bus.longitude, self.known_bus.latitude))
+        self.gyelp = self.known_bus.copy()
+        self.gyelp = gpd.GeoDataFrame(self.gyelp, geometry=gpd.points_from_xy(self.known_bus.longitude, self.known_bus.latitude))
         self.gyelp = self.gyelp.set_crs('EPSG:4326')
         self.gyelp = gpd.sjoin(self.gyelp,self.geometry,how='right',predicate='within')
         self.yelp_count = self.gyelp.drop_duplicates(subset=['id']).groupby(['gemeentenaam','wijknaam','buurtnaam'])[['id']].count().sort_values(by='id')
@@ -25,7 +26,7 @@ class YelpScraper():
         self.latlng_grid = pd.DataFrame()
 
 
-    def generate_latlnong_grid(self,res=40,knwon_bus_thrs=20):
+    def generate_latlong_grid(self,res=40,knwon_bus_thrs=20):
         props =  pd.read_csv('./data/localized_data.csv')
         props = gpd.GeoDataFrame(props, geometry=gpd.points_from_xy(props.longitude, props.latitude))
         props = props.set_crs('EPSG:4326')
