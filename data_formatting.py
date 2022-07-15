@@ -54,9 +54,9 @@ class DataFormatter():
 
     def run_formatting(self,train):
         if train:
-            self.format_data(self.train_data,min_price=100,train=True)
+            self.train_data = self.format_data(self.train_data,min_price=100,train=True)
         else:
-            self.format_data(self.val_data,min_price=100,train=True)
+            self.val_data = self.format_data(self.val_data,min_price=100,train=True)
     
     def train_val_split(self):
         #TODO
@@ -157,7 +157,7 @@ class DataFormatter():
         data.loc[data.latitude.isna(),'latitude'] = data[data.latitude.isna()].postcode.map(dict(coordmap.latitude))
         data.loc[data.longitude.isna(),'longitude'] = data[data.longitude.isna()].postcode.map(dict(coordmap.longitude))
 
-        print('Finding Coordinated for missing Postcodes')
+        print('Finding Coordinated for Missing Postcodes')
         coordscraper.get_coordinates(data[data['latitude'].isna()][['postcode','city','latitude','longitude']].drop_duplicates())
         coordscraper.save_new_coords()
 
@@ -170,3 +170,7 @@ class DataFormatter():
             self.trained = True
 
         return data
+
+    def save_data(self):
+        self.train_data.to_csv('./data/formatted_train_data.csv',index=False)
+        self.train_data.to_csv('./data/formatted_val_data.csv',index=False)

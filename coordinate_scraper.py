@@ -5,8 +5,11 @@ from tqdm.notebook import tqdm
 
 class CoordScraper():
     def __init__(self):
-        self.known_coords = pd.read_csv('./data/postcode_coordinates.csv')
-        self.new_coords = pd.DataFrame()
+        try:
+            self.known_coords = pd.read_csv('./data/postcode_coordinates.csv')
+        except FileNotFoundError as e:
+            self.known_coords = pd.DataFrame(columns=['postcode','latitude','longitude'])
+        self.new_coords = pd.DataFrame(columns=['postcode','latitude','longitude'])
             
     def get_coordinates(self,df):
         coords = {}

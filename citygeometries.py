@@ -6,7 +6,7 @@ from shapely.geometry import MultiPolygon, Polygon
 class CityGeometries():
 
     def __init__(self):
-        data = pd.read_csv('./data/formatted_data.csv')
+        data = pd.read_csv('./data/formatted_train_data.csv')
         self.gdata = gpd.GeoDataFrame(data, geometry=gpd.points_from_xy(data.longitude, data.latitude))
         self.gdata = self.gdata.set_crs('EPSG:4326')
 
@@ -167,7 +167,7 @@ class CityGeometries():
                                 (self.props['wijknaam']==wik)&
                                 (self.props['buurtnaam']==brt))].reset_index(drop=True)
                     continue 
-                    
+                
                 jburt = brt_tojoin+' & '+brt
                 jwik = wik_tojoin+' & '+wik
 
