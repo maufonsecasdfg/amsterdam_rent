@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+#cred
+credentials/*
+
+# gpkg
+*.gpkg
+
 # C extensions
 *.so
 
