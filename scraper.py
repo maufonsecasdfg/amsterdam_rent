@@ -51,7 +51,6 @@ class Scraper():
                     while tries <= 3:
                         try:
                             response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True)
-                            print(f"Status Code: {response.status_code}") ####DEBUG
                         except httpx.TimeoutException as errt:
                             print('                Timeout Error, retrying...')
                             err = errt
@@ -161,9 +160,11 @@ class Scraper():
                     print(f'        Running city: {city}')
                     self.scrape(city, site, post_type, max_pages)
         self.properties = self.properties.drop_duplicates()
+        self.properties = self.properties.dropna(subset=['price', 'surface', 'rooms'])
         self.properties['price'] = self.properties['price'].astype(int)
         self.properties['surface'] = self.properties['surface'].astype(int)
         self.properties['rooms'] = self.properties['rooms'].astype(int)
+        print(self.properties)
 
     def generate_headers(self):
 
