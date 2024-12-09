@@ -51,12 +51,12 @@ WHEN MATCHED THEN
     property.last_scrape_date = DATE("{current_date}")
 WHEN NOT MATCHED THEN
   INSERT (
-    source, scrape_date, post_type, city, location, postcode, title, price, price_type, 
+    source, post_type, city, location, postcode, title, price, price_type, 
     surface, surface_unit, rooms, furnished, url, first_scrape_date, last_scrape_date, 
     longitude, latitude
   )
   VALUES (
-    tmp.source, tmp.scrape_date, tmp.post_type, tmp.city, tmp.location, tmp.postcode, 
+    tmp.source, tmp.post_type, tmp.city, tmp.location, tmp.postcode, 
     tmp.title, tmp.price, tmp.price_type, tmp.surface, tmp.surface_unit, tmp.rooms, 
     tmp.furnished, tmp.url, DATE("{current_date}"), DATE("{current_date}"), 
     NULL, NULL
