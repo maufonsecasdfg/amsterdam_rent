@@ -50,7 +50,7 @@ class Scraper():
                     err = None
                     while tries <= 3:
                         try:
-                            response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True)
+                            response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True, timeout=20.0)
                         except httpx.TimeoutException as errt:
                             print('                Timeout Error, retrying...')
                             err = errt
@@ -144,7 +144,7 @@ class Scraper():
 
                         df = pd.DataFrame(data)
                         self.properties = pd.concat([self.properties,df]).reset_index(drop=True)
-                        time.sleep(1 + 5*random())
+                        time.sleep(2.5 + 20*random())
                         page += 1
                     else:
                         print('            Reached final page.')
@@ -164,62 +164,51 @@ class Scraper():
         self.properties['price'] = self.properties['price'].astype(int)
         self.properties['surface'] = self.properties['surface'].astype(int)
         self.properties['rooms'] = self.properties['rooms'].astype(int)
-        print(self.properties)
 
     def generate_headers(self):
-
-        user_agent = [
-            ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246'],
-            ['Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36'],
-            ['Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36'],
-            ['Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1'],
-            ['Mozilla/5.0 (Linux; U; Android 4.2.3; he-il; NEO-X5-116A Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/5.0 Safari/534.30'],
-            ['Mozilla/5.0 (X11; U; Linux armv7l like Android; en-us) AppleWebKit/531.2+ (KHTML, like Gecko) Version/5.0 Safari/533.2+ Kindle/3.0+'],
-            ['Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36'],
-            ['Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/69.0.3497.105 Mobile/15E148 Safari/605.1']
+        user_agents = [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.198 Safari/537.36",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:110.0) Gecko/20100101 Firefox/110.0",
+            "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:110.0) Gecko/20100101 Firefox/110.0",
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
         ]
 
-        SecFetchUser = ['?1','?T','?F']
-        SecFetchSite = ['cross-site','same-origin','same-site']
-        SecFetchMode = ['websocket','no-cors','same-origin','cors']
-
-        AcceptEncoding = [
-                ['gzip','identity'],['gzip','deflate','identity'],['br','deflate','gzip'],
-                ['identity','br','deflate'],['gzip','deflate']
+        # These headers typically have stable values or minimal variation.
+        # Randomizing them too much may actually reduce credibility.
+        accept_encodings = [
+            "gzip, deflate, br",
+            "gzip, deflate",
+            "br, gzip"
         ]
 
-        AcceptLanguage = [
-            ['nl-NL,nl;q=0.'+str(randint(1,9)),'en-USA,en;q=0.'+str(randint(1,9))],
-            ['fr-CH,fr;q=0.'+str(randint(1,9)),'nl-NL,nl;q=0.'+str(randint(1,9))],
-            ['nl-NL,nl;q=0.'+str(randint(1,9)),'de;q=0.'+str(randint(1,9))],
-            ['nl-NL,nl;q=0.'+str(randint(1,9)),'de-CH;q=0.'+str(randint(1,9))]
+        accept_languages = [
+            "en-US,en;q=0.9",
+            "en-GB,en;q=0.9",
+            "nl-NL,nl;q=0.9,en-US,en;q=0.8",
+            "fr-FR,fr;q=0.9,en-US,en;q=0.8"
         ]
 
-        value_fetchuser = randint(0,2)
-        value_site = randint(0,2)
-        value_mode = randint(0,3)
-        value_userag = randint(0,7)
-
-        str_user = ','.join(user_agent[value_userag])
-
-        accptenco = randint(0,3)
-        str3 = ','.join(AcceptEncoding[accptenco])
-        accplang = randint(0,3)
-        str4 = ','.join(AcceptLanguage[accplang])
+        # Sec-Fetch headers typically reflect browser behavior.
+        # You can keep them stable for now to seem more like a normal browser.
+        sec_fetch_site = random.choice(["none", "same-origin", "cross-site"])
+        sec_fetch_mode = random.choice(["navigate", "cors", "no-cors", "same-origin"])
+        sec_fetch_user = "?1"  # This header often appears as "?1" when a human navigates
 
         headers = {
-            'Connection': 'keep-alive',
-            'Cache-Control': 'max-age=0',
-            'DNT': '0',
-            'Upgrade-Insecure-Requests': '1',
-            'User-Agent': str_user,
-            'Sec-Fetch-User':SecFetchUser[value_fetchuser],
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.7,image/webp,image/apng,*/*;q=0.3,application/signed-exchange;v=b3',
-            'Sec-Fetch-Dest':'none',
-            'Sec-Fetch-Site': SecFetchSite[value_site],
-            'Sec-Fetch-Mode': SecFetchMode[value_mode],
-            'Accept-Encoding': str3,
-            'Accept-Language': str4
+            "Connection": "keep-alive",
+            "Cache-Control": "max-age=0",
+            "DNT": "0",
+            "Upgrade-Insecure-Requests": "1",
+            "User-Agent": random.choice(user_agents),
+            "Sec-Fetch-User": sec_fetch_user,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Site": sec_fetch_site,
+            "Sec-Fetch-Mode": sec_fetch_mode,
+            "Accept-Encoding": random.choice(accept_encodings),
+            "Accept-Language": random.choice(accept_languages),
         }
 
         return headers
