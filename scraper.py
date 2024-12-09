@@ -1,7 +1,7 @@
 import httpx
 import json
 from bs4 import BeautifulSoup
-from random import random, randint
+import random
 import time
 import pandas as pd
 from datetime import date
@@ -144,7 +144,7 @@ class Scraper():
 
                         df = pd.DataFrame(data)
                         self.properties = pd.concat([self.properties,df]).reset_index(drop=True)
-                        time.sleep(2.5 + 20*random())
+                        time.sleep(2.5 + 20*random.random())
                         page += 1
                     else:
                         print('            Reached final page.')
