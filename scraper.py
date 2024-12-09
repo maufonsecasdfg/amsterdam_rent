@@ -51,7 +51,7 @@ class Scraper():
                     while tries <= 3:
                         try:
                             response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True)
-                            print(response.text) ####DEBUG
+                            print(f"Status Code: {response.status_code}") ####DEBUG
                         except httpx.TimeoutException as errt:
                             print('                Timeout Error, retrying...')
                             err = errt

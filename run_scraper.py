@@ -38,7 +38,7 @@ job_config = bigquery.LoadJobConfig(
     write_disposition="WRITE_TRUNCATE",
 )
 
-load_job = client.load_table_from_dataframe(s.property, tmp_table_id, job_config=job_config)
+load_job = client.load_table_from_dataframe(s.properties, tmp_table_id, job_config=job_config)
 load_job.result()
 
 # Query to merge tmp_property to property
