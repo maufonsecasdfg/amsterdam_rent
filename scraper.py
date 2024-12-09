@@ -12,9 +12,9 @@ class Scraper():
     def __init__(self):
         self.properties = pd.DataFrame()
         
-    def process_price(price_text):
+    def process_price(self, price_text):
         pattern = r'.*\d[\d.,]*\s*-\s*\d[\d.,]*.*' # price range pattern
-        price_text = price_text.replace('€','')
+        price_text = price_text.replace('€','').replace('\n','')
         if bool(re.match(pattern, price_text)):
             num1str = re.sub(r'[^\d]', '', price_text.split('-')[0])
             num2str = re.sub(r'[^\d]', '', price_text.split('-')[1])
@@ -51,6 +51,7 @@ class Scraper():
                     while tries <= 3:
                         try:
                             response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True)
+                            print(response.text) ####DEBUG
                         except httpx.TimeoutException as errt:
                             print('                Timeout Error, retrying...')
                             err = errt
@@ -118,7 +119,8 @@ class Scraper():
                                     price, price_type = self.process_price(pr.get_text())
                                     data['price'].append(price)
                                     data['price_type'].append(price_type)
-                                except:
+                                except Exception as e:
+                                    print(e)
                                     data['price'].append(None)
                                     data['price_type'].append(None)
                             else:
@@ -159,6 +161,9 @@ class Scraper():
                     print(f'        Running city: {city}')
                     self.scrape(city, site, post_type, max_pages)
         self.properties = self.properties.drop_duplicates()
+        self.properties['price'] = self.properties['price'].astype(int)
+        self.properties['surface'] = self.properties['surface'].astype(int)
+        self.properties['rooms'] = self.properties['rooms'].astype(int)
 
     def generate_headers(self):
 

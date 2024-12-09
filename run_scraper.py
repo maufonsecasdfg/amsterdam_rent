@@ -13,9 +13,9 @@ s = Scraper()
 s.run(**scraper_config)
 
 client = bigquery.Client()
-tmp_table_id = f"{bigquery_config['project-id']}.{bigquery_config['dataset-id']}.tmp_property"
-property_table_id = f"{bigquery_config['project-id']}.{bigquery_config['dataset-id']}.property"
-postcode_coordinates_table_id = f"{bigquery_config['project-id']}.{bigquery_config['dataset-id']}.postcode_coordinates"
+tmp_table_id = f"{bigquery_config['project_id']}.{bigquery_config['dataset_id']}.tmp_property"
+property_table_id = f"{bigquery_config['project_id']}.{bigquery_config['dataset_id']}.property"
+postcode_coordinates_table_id = f"{bigquery_config['project_id']}.{bigquery_config['dataset_id']}.postcode_coordinates"
 current_date = datetime.now(tz=ZoneInfo("Europe/Amsterdam")).strftime('%Y-%m-%d')
 
 job_config = bigquery.LoadJobConfig(
