@@ -11,6 +11,26 @@ class Scraper():
 
     def __init__(self):
         self.properties = pd.DataFrame()
+        
+    def process_price(price_text):
+        pattern = r'.*\d[\d.,]*\s*-\s*\d[\d.,]*.*' # price range pattern
+        price_text = price_text.replace('€','')
+        if bool(re.match(pattern, price_text)):
+            num1str = re.sub(r'[^\d]', '', price_text.split('-')[0])
+            num2str = re.sub(r'[^\d]', '', price_text.split('-')[1])
+            num1 = int(num1str)
+            num2 = int(num2str)
+            price = int((num1+num2)/2)
+            price_type = ' '.join(price_text.replace('.','')
+                                  .replace(',','')
+                                  .replace(num1str,'')
+                                  .replace(num2str,'')
+                                  .strip()
+                                  .split(' ')[1:]).strip()
+        else:
+            price = int(re.sub(r'[^\d]', '', price_text))
+            price_type = ' '.join(price_text.strip().split(' ')[1:])
+        return price, price_type           
 
     def scrape(self, city, site, post_type, max_pages=10000):
         properties = []
@@ -94,8 +114,13 @@ class Scraper():
                                 data['url'].append(None)
                             pr = p.find('div',class_="listing-search-item__price")
                             if pr is not None:
-                                data['price'].append(re.sub(r'[^\d]', '', pr.get_text()))
-                                data['price_type'].append(' '.join(pr.get_text().replace('€','').strip().split(' ')[1:]))
+                                try:
+                                    price, price_type = self.process_price(pr.get_text())
+                                    data['price'].append(price)
+                                    data['price_type'].append(price_type)
+                                except:
+                                    data['price'].append(None)
+                                    data['price_type'].append(None)
                             else:
                                 data['price'].append(None)
                                 data['price_type'].append(None)

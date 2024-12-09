@@ -1,7 +1,6 @@
 from scraper import Scraper
 import json
 from google.cloud import bigquery
-import pandas as pd
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -16,6 +15,7 @@ s.run(**scraper_config)
 client = bigquery.Client()
 tmp_table_id = f"{bigquery_config['project-id']}.{bigquery_config['dataset-id']}.tmp_property"
 property_table_id = f"{bigquery_config['project-id']}.{bigquery_config['dataset-id']}.property"
+postcode_coordinates_table_id = f"{bigquery_config['project-id']}.{bigquery_config['dataset-id']}.postcode_coordinates"
 current_date = datetime.now(tz=ZoneInfo("Europe/Amsterdam")).strftime('%Y-%m-%d')
 
 job_config = bigquery.LoadJobConfig(
@@ -41,6 +41,7 @@ job_config = bigquery.LoadJobConfig(
 load_job = client.load_table_from_dataframe(s.property, tmp_table_id, job_config=job_config)
 load_job.result()
 
+# Query to merge tmp_property to property
 query = f"""
 MERGE `{property_table_id}` AS property
 USING `{tmp_table_id}` AS tmp
@@ -65,5 +66,36 @@ job = client.query(query)
 job.result()
 
 client.delete_table(tmp_table_id, not_found_ok=True)
+
+query = f"""
+MERGE `{property_table_id}` AS property
+USING (
+  SELECT * 
+  FROM `{postcode_coordinates_table_id}` AS coords
+  WHERE coords.postcode IN (
+    SELECT postcode 
+    FROM `{property_table_id}` 
+    WHERE latitude IS NULL
+  )
+) AS coords
+ON property.postcode = coords.postcode
+WHEN MATCHED THEN
+  UPDATE SET 
+    property.latitude = coords.latitude,
+    property.longitude = coords.longitude
+"""
+
+job = client.query(query)
+job.result()
+
+
+
+
+
+
+
+
+
+
 
 
