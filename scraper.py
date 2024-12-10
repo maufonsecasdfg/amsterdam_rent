@@ -93,6 +93,8 @@ class Scraper():
                             print(f'            Tries exceeded with error: {err}')
                             page += 1
                             continue
+                        
+                    print(response.__dict__)
 
                     soup = BeautifulSoup(response.text,'html.parser')
                     page_propts = soup.find_all('li', class_="search-list__item search-list__item--listing")
