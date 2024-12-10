@@ -85,7 +85,9 @@ class Scraper():
                             tries += 1
                     if tries == 3:
                         if err is None:
-                            print('            Reached final page.')
+                            print('            Reached final page (tries route).')
+                            print(response.text)
+                            print(response.__dict__)
                             break
                         else:
                             print(f'            Tries exceeded with error: {err}')
