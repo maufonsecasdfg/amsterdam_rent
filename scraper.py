@@ -167,7 +167,9 @@ class Scraper():
                         time.sleep(1 + 10*random.random())
                         page += 1
                     else:
-                        print('            Reached final page.')
+                        print('            Reached final page (no properties route).')
+                        print(response.text)
+                        print(response.__dict__)
                         break
 
     def run(self, cities, sites, post_types, max_pages=10000):
