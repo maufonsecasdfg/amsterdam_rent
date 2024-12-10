@@ -7,7 +7,7 @@ import pandas as pd
 from datetime import date
 import re
 import chardet
-#from google.cloud import secretmanager
+from google.cloud import secretmanager
 
 
 with open('config/bigquery_config.json', 'r') as f:
@@ -38,15 +38,15 @@ class Scraper():
             price_type = ' '.join(price_text.strip().split(' ')[1:])
         return price, price_type    
     
-    #def get_proxies_from_secret(self, secret_name):
-    #    client = secretmanager.SecretManagerServiceClient()
-    #    name = f"projects/{bigquery_config['project_id']}/secrets/{secret_name}/versions/latest"
-    #    response = client.access_secret_version(request={"name": name})
-    #    return json.loads(response.payload.data.decode("UTF-8"))
+    def get_proxies_from_secret(self, secret_name):
+        client = secretmanager.SecretManagerServiceClient()
+        name = f"projects/{bigquery_config['project_id']}/secrets/{secret_name}/versions/latest"
+        response = client.access_secret_version(request={"name": name})
+        return json.loads(response.payload.data.decode("UTF-8"))
 
-    #def get_random_proxy(self, secret_name):
-    #    proxies = self.get_proxies_from_secret(secret_name)
-    #    return random.choice(proxies)
+    def get_random_proxy(self, secret_name):
+        proxies = self.get_proxies_from_secret(secret_name)
+        return random.choice(proxies)
 
     def scrape(self, city, site, post_type, max_pages=10000):
         properties = []
@@ -60,42 +60,49 @@ class Scraper():
                     base_url = f'https://www.pararius.nl/koopwoningen/{city}/{typ}/'
                 page = 1
                 while page <= max_pages:
-                    print(f'            Page: {page}')
-                    headers = self.generate_headers()
                     tries = 0
                     err = None
-                    while tries <= 3:
-                        #proxy_list_secret_name = "proxy-list" 
-                        #proxy_url = self.get_random_proxy(proxy_list_secret_name)
-                        #proxies = {"http://": proxy_url, "https://": proxy_url}
+                    while tries <= 15:
+                        print(f'            Page: {page}')
+                        headers = self.generate_headers()
+                        proxy_list_secret_name = "proxy-list" 
+                        proxy_url = self.get_random_proxy(proxy_list_secret_name)
+                        proxies = {"http://": proxy_url, "https://": proxy_url}
                         try:
-                            #response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True, proxies=proxies)
-                            response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True)
+                            response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True, proxies=proxies)
                         except httpx.TimeoutException as errt:
                             print('                Timeout Error, retrying...')
                             err = errt
                             tries += 1
+                            time.sleep(1 + 10*random.random())
                             continue
                         except httpx.ConnectError as errc:
                             print('                Connection Error, retrying...')
                             err = errc
                             tries += 1
+                            time.sleep(1 + 10*random.random())
                             continue
                         if str(response.status_code)[0] == '2':
+                            detected_encoding = chardet.detect(response.content)
+                            if detected_encoding['encoding'] == None:
+                                print('Response is corrupted')
+                                tries += 1
+                                time.sleep(1 + 10*random.random())
+                                continue
                             break
                         else:
                             tries += 1
-                    if tries == 3:
+                            time.sleep(1 + 10*random.random())
+                    if tries == 15:
                         if err is None:
                             print('            Reached final page (tries route).')
                             break
                         else:
                             print(f'            Tries exceeded with error: {err}')
                             page += 1
+                            time.sleep(1 + 10*random.random())
                             continue
-                    
-                    detected_encoding = chardet.detect(response.content)
-                    print(detected_encoding)
+                        
                     response.encoding = 'utf-8' 
                     soup = BeautifulSoup(response.text,'html.parser')
                     page_propts = soup.find_all('li', class_="search-list__item search-list__item--listing")
