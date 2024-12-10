@@ -67,6 +67,7 @@ class Scraper():
                         proxy_url = self.get_random_proxy(proxy_list_secret_name)
                         proxies = {"http": proxy_url, "https": proxy_url}
                         try:
+                            print(proxies)  ####DEBUG
                             response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True, timeout=20.0, proxies=proxies)
                         except httpx.TimeoutException as errt:
                             print('                Timeout Error, retrying...')
