@@ -6,6 +6,10 @@ import time
 import pandas as pd
 from datetime import date
 import re
+from google.cloud import secretmanager
+
+with open('config/bigquery_config.json', 'r') as f:
+    bigquery_config = json.load(f)
 
 class Scraper():
 
@@ -30,7 +34,17 @@ class Scraper():
         else:
             price = int(re.sub(r'[^\d]', '', price_text))
             price_type = ' '.join(price_text.strip().split(' ')[1:])
-        return price, price_type           
+        return price, price_type    
+    
+    def get_proxies_from_secret(self, secret_name):
+        client = secretmanager.SecretManagerServiceClient()
+        name = f"projects/{bigquery_config['project_id']}/secrets/{secret_name}/versions/latest"
+        response = client.access_secret_version(request={"name": name})
+        return json.loads(response.payload.data.decode("UTF-8"))
+
+    def get_random_proxy(self, secret_name):
+        proxies = self.get_proxies_from_secret(secret_name)
+        return random.choice(proxies)
 
     def scrape(self, city, site, post_type, max_pages=10000):
         properties = []
@@ -49,8 +63,11 @@ class Scraper():
                     tries = 0
                     err = None
                     while tries <= 3:
+                        proxy_list_secret_name = "proxy-list" 
+                        proxy_url = self.get_random_proxy(proxy_list_secret_name)
+                        proxies = {"http": proxy_url, "https": proxy_url}
                         try:
-                            response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True, timeout=20.0)
+                            response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True, timeout=20.0, proxies=proxies)
                         except httpx.TimeoutException as errt:
                             print('                Timeout Error, retrying...')
                             err = errt
@@ -144,7 +161,7 @@ class Scraper():
 
                         df = pd.DataFrame(data)
                         self.properties = pd.concat([self.properties,df]).reset_index(drop=True)
-                        time.sleep(2.5 + 20*random.random())
+                        time.sleep(1 + 10*random.random())
                         page += 1
                     else:
                         print('            Reached final page.')
@@ -212,8 +229,6 @@ class Scraper():
         }
 
         return headers
-
-    
-    
+        
     
         

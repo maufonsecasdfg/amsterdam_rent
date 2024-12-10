@@ -66,36 +66,3 @@ job = client.query(query)
 job.result()
 
 client.delete_table(tmp_table_id, not_found_ok=True)
-
-query = f"""
-MERGE `{property_table_id}` AS property
-USING (
-  SELECT * 
-  FROM `{postcode_coordinates_table_id}` AS coords
-  WHERE coords.postcode IN (
-    SELECT postcode 
-    FROM `{property_table_id}` 
-    WHERE latitude IS NULL
-  )
-) AS coords
-ON property.postcode = coords.postcode
-WHEN MATCHED THEN
-  UPDATE SET 
-    property.latitude = coords.latitude,
-    property.longitude = coords.longitude
-"""
-
-job = client.query(query)
-job.result()
-
-
-
-
-
-
-
-
-
-
-
-
