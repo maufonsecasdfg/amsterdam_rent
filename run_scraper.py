@@ -3,14 +3,16 @@ import json
 from google.cloud import bigquery
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import logging
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 with open('config/scraper_config.json', 'r') as f:
     scraper_config = json.load(f)
 with open('config/bigquery_config.json', 'r') as f:
     bigquery_config = json.load(f)
 
-print("Starting scraper...")
+logging.info("Starting scraper...")
 try:
     s = Scraper()
     s.run(**scraper_config)
@@ -71,4 +73,4 @@ try:
     client.delete_table(tmp_table_id, not_found_ok=True)
         
 except Exception as e:
-    print(f"Scraper error: {e}")
+    logging.error(f"Scraper error: {e}")

@@ -8,6 +8,9 @@ from datetime import date
 import re
 import chardet
 from google.cloud import secretmanager
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 with open('config/bigquery_config.json', 'r') as f:
@@ -53,31 +56,32 @@ class Scraper():
         if site == 'pararius':
             for typ in ['appartement','huis','studio']:
                 if post_type == 'Rent':
-                    print('            Running all for rent')
+                    logging.info('            Running all for rent')
                     base_url = f'https://www.pararius.com/apartments/{city}/'
                 elif post_type == 'Buy':
-                    print(f'            Running property type: {typ}')
+                    logging.info(f'            Running property type: {typ}')
                     base_url = f'https://www.pararius.nl/koopwoningen/{city}/{typ}/'
                 page = 1
                 while page <= max_pages:
                     tries = 0
                     err = None
                     while tries <= 15:
-                        print(f'            Page: {page}')
+                        logging.info(f'            Page: {page}')
                         headers = self.generate_headers()
-                        proxy_list_secret_name = "proxy-list" 
-                        proxy_url = self.get_random_proxy(proxy_list_secret_name)
-                        proxies = {"http://": proxy_url, "https://": proxy_url}
+                        #proxy_list_secret_name = "proxy-list" 
+                        #proxy_url = self.get_random_proxy(proxy_list_secret_name)
+                        #proxies = {"http://": proxy_url, "https://": proxy_url}
                         try:
-                            response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True, proxies=proxies)
+                            #response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True, proxies=proxies)
+                            response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True)
                         except httpx.TimeoutException as errt:
-                            print('                Timeout Error, retrying...')
+                            logging.info('                Timeout Error, retrying...')
                             err = errt
                             tries += 1
                             time.sleep(1 + 10*random.random())
                             continue
                         except httpx.ConnectError as errc:
-                            print('                Connection Error, retrying...')
+                            logging.info('                Connection Error, retrying...')
                             err = errc
                             tries += 1
                             time.sleep(1 + 10*random.random())
@@ -85,7 +89,7 @@ class Scraper():
                         if str(response.status_code)[0] == '2':
                             detected_encoding = chardet.detect(response.content)
                             if detected_encoding['encoding'] == None:
-                                print('Response is corrupted')
+                                logging.info('Response is corrupted')
                                 tries += 1
                                 time.sleep(1 + 10*random.random())
                                 continue
@@ -95,10 +99,10 @@ class Scraper():
                             time.sleep(1 + 10*random.random())
                     if tries == 15:
                         if err is None:
-                            print('            Reached final page (tries route).')
+                            logging.info('            Reached final page (tries route).')
                             break
                         else:
-                            print(f'            Tries exceeded with error: {err}')
+                            logging.info(f'            Tries exceeded with error: {err}')
                             page += 1
                             time.sleep(1 + 10*random.random())
                             continue
@@ -149,7 +153,7 @@ class Scraper():
                                     data['price'].append(price)
                                     data['price_type'].append(price_type)
                                 except Exception as e:
-                                    print(e)
+                                    logging.info(e)
                                     data['price'].append(None)
                                     data['price_type'].append(None)
                             else:
@@ -177,17 +181,17 @@ class Scraper():
                         time.sleep(1 + 10*random.random())
                         page += 1
                     else:
-                        print('            Reached final page (no properties route).')
+                        logging.info('            Reached final page (no properties route).')
                         break
 
     def run(self, cities, sites, post_types, max_pages=10000):
         cities, sites, post_types
         for site in sites:
-            print(f'Running Site: {site}')
+            logging.info(f'Running Site: {site}')
             for post_type in post_types:
-                print(f'    Running post types: {post_type}')
+                logging.info(f'    Running post types: {post_type}')
                 for city in cities:
-                    print(f'        Running city: {city}')
+                    logging.info(f'        Running city: {city}')
                     self.scrape(city, site, post_type, max_pages)
         self.properties = self.properties.drop_duplicates()
         self.properties = self.properties.dropna(subset=['price', 'surface', 'rooms'])
@@ -202,22 +206,6 @@ class Scraper():
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:110.0) Gecko/20100101 Firefox/110.0",
             "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:110.0) Gecko/20100101 Firefox/110.0",
-            "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
-        ]
-
-        # These headers typically have stable values or minimal variation.
-        # Randomizing them too much may actually reduce credibility.
-        accept_encodings = [
-            "gzip, deflate, br",
-            "gzip, deflate",
-            "br, gzip"
-        ]
-
-        accept_languages = [
-            "en-US,en;q=0.9",
-            "en-GB,en;q=0.9",
-            "nl-NL,nl;q=0.9,en-US,en;q=0.8",
-            "fr-FR,fr;q=0.9,en-US,en;q=0.8"
         ]
 
         # Sec-Fetch headers typically reflect browser behavior.
@@ -236,9 +224,7 @@ class Scraper():
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
             "Sec-Fetch-Dest": "document",
             "Sec-Fetch-Site": sec_fetch_site,
-            "Sec-Fetch-Mode": sec_fetch_mode,
-            "Accept-Encoding": random.choice(accept_encodings),
-            "Accept-Language": random.choice(accept_languages),
+            "Sec-Fetch-Mode": sec_fetch_mode
         }
 
         return headers
