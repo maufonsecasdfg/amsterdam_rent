@@ -8,6 +8,7 @@ from datetime import date
 import re
 from google.cloud import secretmanager
 
+
 with open('config/bigquery_config.json', 'r') as f:
     bigquery_config = json.load(f)
 
