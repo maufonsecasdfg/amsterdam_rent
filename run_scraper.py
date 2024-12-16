@@ -20,7 +20,6 @@ try:
     client = bigquery.Client()
     tmp_table_id = f"{bigquery_config['project_id']}.{bigquery_config['dataset_id']}.tmp_property"
     property_table_id = f"{bigquery_config['project_id']}.{bigquery_config['dataset_id']}.property"
-    postcode_coordinates_table_id = f"{bigquery_config['project_id']}.{bigquery_config['dataset_id']}.postcode_coordinates"
     current_date = datetime.now(tz=ZoneInfo("Europe/Amsterdam")).strftime('%Y-%m-%d')
 
     job_config = bigquery.LoadJobConfig(
@@ -32,6 +31,7 @@ try:
             bigquery.SchemaField("location", "STRING"),
             bigquery.SchemaField("postcode", "STRING"),
             bigquery.SchemaField("title", "STRING"),
+            bigquery.SchemaField("property_type", "STRING"),
             bigquery.SchemaField("price", "INTEGER"),
             bigquery.SchemaField("price_type", "STRING"),
             bigquery.SchemaField("surface", "INTEGER"),
@@ -56,15 +56,13 @@ try:
         property.last_scrape_date = DATE("{current_date}")
     WHEN NOT MATCHED THEN
     INSERT (
-        source, post_type, city, location, postcode, title, price, price_type, 
-        surface, surface_unit, rooms, furnished, url, first_scrape_date, last_scrape_date, 
-        longitude, latitude
+        source, post_type, city, location, postcode, title, property_type, price, price_type, 
+        surface, surface_unit, rooms, furnished, url, first_scrape_date, last_scrape_date
     )
     VALUES (
         tmp.source, tmp.post_type, tmp.city, tmp.location, tmp.postcode, 
-        tmp.title, tmp.price, tmp.price_type, tmp.surface, tmp.surface_unit, tmp.rooms, 
-        tmp.furnished, tmp.url, DATE("{current_date}"), DATE("{current_date}"), 
-        NULL, NULL
+        tmp.title, tmp.property_type, tmp.price, tmp.price_type, tmp.surface, tmp.surface_unit, tmp.rooms, 
+        tmp.furnished, tmp.url, DATE("{current_date}"), DATE("{current_date}")
     )
     """
     job = client.query(query)

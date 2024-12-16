@@ -52,9 +52,11 @@ class Scraper():
         return random.choice(proxies)
 
     def scrape(self, city, site, post_type, max_pages=10000):
-        properties = []
+        types = []
+        if post_type == 'Buy':
+            types = ['appartement','huis','studio']
         if site == 'pararius':
-            for typ in ['appartement','huis','studio']:
+            for typ in types:
                 if post_type == 'Rent':
                     logging.info('            Running all for rent')
                     base_url = f'https://www.pararius.com/apartments/{city}/'
@@ -73,7 +75,7 @@ class Scraper():
                         #proxies = {"http://": proxy_url, "https://": proxy_url}
                         try:
                             #response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True, proxies=proxies)
-                            response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True)
+                            response = httpx.get(base_url+f'page-{page}', headers=headers)
                         except httpx.TimeoutException as errt:
                             logging.info('                Timeout Error, retrying...')
                             err = errt
@@ -112,13 +114,14 @@ class Scraper():
                     page_propts = soup.find_all('li', class_="search-list__item search-list__item--listing")
 
                     if len(page_propts) != 0:
-                        data = {'source': [],
+                        data = {'page_source': [],
                                 'scrape_date': [],
                                 'post_type': [],
                                 'city': [],
                                 'location': [],
                                 'postcode': [],
                                 'title': [],
+                                'property_type': [],
                                 'price': [],
                                 'price_type': [],
                                 'surface': [],
@@ -128,7 +131,7 @@ class Scraper():
                                 'url': []
                             }
                         for p in page_propts:
-                            data['source'].append('Pararius')
+                            data['page_source'].append('Pararius')
                             data['scrape_date'].append(date.today())
                             data['city'].append(city)
                             data['post_type'].append(post_type)
@@ -142,9 +145,11 @@ class Scraper():
                             t = p.find('a',class_='listing-search-item__link listing-search-item__link--title')
                             if t is not None:
                                 data['title'].append(t.get_text().replace('\n','').strip())
+                                data['property_type'].append(t.get_text().replace('\n','').strip().split(' ')[0].strip())
                                 data['url'].append('https://www.pararius.nl' + t.attrs['href'])
                             else:
                                 data['title'].append(None)
+                                data['property_type'].append(None)
                                 data['url'].append(None)
                             pr = p.find('div',class_="listing-search-item__price")
                             if pr is not None:
