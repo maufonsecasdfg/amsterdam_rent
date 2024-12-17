@@ -10,7 +10,7 @@ from shapely.geometry import MultiPolygon, Polygon
 
 # Data from https://www.cbs.nl/nl-nl/maatwerk/2024/35/buurt-wijk-en-gemeente-2024-voor-postcode-huisnummer and https://www.cbs.nl/nl-nl/dossier/nederland-regionaal/geografische-data/wijk-en-buurtkaart-2024
 
-def generate_postcode_gwb_and_geodata_tables(selected_gemeenten, tmp_dir, output_dir):
+def generate_postcode_gwb_and_geodata_tables(selected_gemeenten, tmp_dir, output_dir, buurt_to_stadsdeel_mapping_path=None):
     ### Using data from: https://www.cbs.nl
     
     # NOTE: A lot of demographic and other data is available in the kaart data. Maybe use this later for something.
@@ -112,16 +112,16 @@ def generate_postcode_gwb_and_geodata_tables(selected_gemeenten, tmp_dir, output
         pc6_df['pc6_jaar'] = year
         
         pc6_df = pc6_df[['postcode', 'gemeente', 'gemeente_code', 'wijk', 'wijk_code', 'buurt', 'buurt_code', 'pc6_jaar']]
+        
+        if buurt_to_stadsdeel_mapping_path:
+            buurt_to_stadsdeel_mapping_df = pd.read_csv(buurt_to_stadsdeel_mapping_path, sep=';')
+            pc6_df = pc6_df.set_index('buurt').join(buurt_to_stadsdeel_mapping_df.set_index('buurt')).reset_index()
+            pc6_df = pc6_df[['postcode', 'gemeente', 'gemeente_code', 'wijk', 'wijk_code', 'buurt', 'buurt_code', 'stadsdeel_onderverdeling', 'stadsdeel', 'pc6_jaar']]
 
         pc6_df.to_csv(os.path.join(output_dir, 'postcode_gwb.csv'), sep=';', index=False)
         print(f"Postcode-GWB CSV file saved to: {os.path.join(output_dir, 'postcode_gwb.csv')}")
         
         geodata_path = os.path.join(tmp_dir, f'WijkBuurtkaart_{year}_v1', f'wijkenbuurten_{year}_v1.gpkg')
-        
-        def ensure_multipolygon(geom):
-            if isinstance(geom, Polygon):
-                return MultiPolygon([geom])
-            return geom
         
         gemeente_geodata = gpd.read_file(geodata_path,layer='gemeenten')
         gemeente_geodata = gemeente_geodata[(
@@ -208,7 +208,12 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
     
     try:
-        downloaded = generate_postcode_gwb_and_geodata_tables(selected_gemeenten, tmp_dir, output_dir)
+        downloaded = generate_postcode_gwb_and_geodata_tables(
+            selected_gemeenten, 
+            tmp_dir, 
+            output_dir, 
+            buurt_to_stadsdeel_mapping_path='geodata/buurt_stadsdeel_mapping.csv'
+            )
         if downloaded:
             print("Table generation completed successfully.")
         else:
