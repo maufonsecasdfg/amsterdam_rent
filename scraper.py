@@ -108,7 +108,7 @@ class Scraper():
                             time.sleep(1 + 10*random.random())
                     if tries == max_tries:
                         if err is None:
-                            logging.info('Reached final page (tries route).')
+                            logging.info('Exceded number of tries.')
                             break
                         else:
                             logging.info(f'Tries exceeded with error: {err}')
@@ -120,9 +120,13 @@ class Scraper():
                     soup = BeautifulSoup(response.text,'html.parser')
                     page_propts = soup.find_all('li', class_="search-list__item search-list__item--listing")
                     if page == 1:
-                        pagination = soup.find_all('a', class_="pagination__link")
-                        max_pages = int(pagination[-2].text)
-                        logging.info(f'Total pages: {max_pages}')
+                        try:
+                            pagination = soup.find_all('a', class_="pagination__link")
+                            max_pages = int(pagination[-2].text)
+                            logging.info(f'Total pages: {max_pages}')
+                        except:
+                            logging.info(f'No pages found.')
+                            break
 
                     if len(page_propts) != 0:
                         data = {'page_source': [],
@@ -197,7 +201,7 @@ class Scraper():
                         time.sleep(1 + 10*random.random())
                         page += 1
                     else:
-                        logging.info('Reached final page (no properties route).')
+                        logging.info('Reached page with no properties.')
                         break
 
     def run(self, cities, sites, post_types):
