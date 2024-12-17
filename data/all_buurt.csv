@@ -1,0 +1,514 @@
+buurt,wijk
+Planciusbuurt-Noord,Haarlemmerbuurt
+Westelijke eilanden,Haarlemmerbuurt
+Westerdokseiland,Haarlemmerbuurt
+Planciusbuurt-Zuid,Haarlemmerbuurt
+Haarlemmerbuurt-West,Haarlemmerbuurt
+Haarlemmerbuurt-Oost,Haarlemmerbuurt
+Marnixbuurt-Noord,Jordaan
+Driehoekbuurt,Jordaan
+Anjeliersbuurt-Noord,Jordaan
+Zaagpoortbuurt,Jordaan
+Anjeliersbuurt-Zuid,Jordaan
+Marnixbuurt-Midden,Jordaan
+Bloemgrachtbuurt,Jordaan
+Groenmarktkadebuurt,Jordaan
+Marnixbuurt-Zuid,Jordaan
+Elandsgrachtbuurt,Jordaan
+Passeerdersgrachtbuurt,Jordaan
+Langestraat e.o.,Grachtengordel-West
+Leliegracht e.o.,Grachtengordel-West
+Felix Meritisbuurt,Grachtengordel-West
+Leidsegracht-Noord,Grachtengordel-West
+Stationsplein e.o.,Burgwallen-Nieuwe Zijde
+Hemelrijk,Burgwallen-Nieuwe Zijde
+Nieuwendijk-Noord,Burgwallen-Nieuwe Zijde
+Spuistraat-Noord,Burgwallen-Nieuwe Zijde
+Nieuwe Kerk e.o.,Burgwallen-Nieuwe Zijde
+Spuistraat-Zuid,Burgwallen-Nieuwe Zijde
+Begijnhofbuurt,Burgwallen-Nieuwe Zijde
+Kalverdriehoek,Burgwallen-Nieuwe Zijde
+Kop Zeedijk,Burgwallen-Oude Zijde
+Oude Kerk e.o.,Burgwallen-Oude Zijde
+Burgwallen-Oost,Burgwallen-Oude Zijde
+Nes e.o.,Burgwallen-Oude Zijde
+BG-terrein e.o.,Burgwallen-Oude Zijde
+Oosterdokseiland,Nieuwmarkt/Lastage
+Lastage,Nieuwmarkt/Lastage
+Scheepvaarthuisbuurt,Nieuwmarkt/Lastage
+Rapenburg,Nieuwmarkt/Lastage
+Nieuwmarkt,Nieuwmarkt/Lastage
+Uilenburg,Nieuwmarkt/Lastage
+Valkenburg,Nieuwmarkt/Lastage
+Zuiderkerkbuurt,Nieuwmarkt/Lastage
+Waterloopleinbuurt,Nieuwmarkt/Lastage
+Leidsegracht-Zuid,Grachtengordel-Zuid
+Geelvinckbuurt,Grachtengordel-Zuid
+Rembrandtplein e.o.,Grachtengordel-Zuid
+Spiegelbuurt,Grachtengordel-Zuid
+Vijzelstraatbuurt,Grachtengordel-Zuid
+Amstelveldbuurt,Grachtengordel-Zuid
+Leidsebuurt-Noordwest,De Weteringschans
+Leidsebuurt-Noordoost,De Weteringschans
+Weteringbuurt,De Weteringschans
+Utrechtsebuurt-Zuid,De Weteringschans
+Leidsebuurt-Zuidwest,De Weteringschans
+Leidsebuurt-Zuidoost,De Weteringschans
+Den Texbuurt,De Weteringschans
+Frederikspleinbuurt,De Weteringschans
+Weesperbuurt,Weesperbuurt/Plantage
+Plantage,Weesperbuurt/Plantage
+Sarphatistrook,Weesperbuurt/Plantage
+Alexanderplein e.o.,Weesperbuurt/Plantage
+Marine-Etablissement,Oostelijke Eilanden/Kadijken
+Kattenburg,Oostelijke Eilanden/Kadijken
+Wittenburg,Oostelijke Eilanden/Kadijken
+Oostenburg,Oostelijke Eilanden/Kadijken
+Czaar Peterbuurt,Oostelijke Eilanden/Kadijken
+Het Funen,Oostelijke Eilanden/Kadijken
+Kadijken,Oostelijke Eilanden/Kadijken
+Kazernebuurt,Oostelijke Eilanden/Kadijken
+Afrikahaven,Havens-West
+Amerikahaven,Havens-West
+Westhaven-Noord,Havens-West
+Petroleumhaven,Havens-West
+Vervoerscentrum,Havens-West
+Westhaven-Zuid,Havens-West
+Coenhaven,Coenhaven/Minervahaven
+Vlothaven,Coenhaven/Minervahaven
+Minervahaven-Noordoost,Coenhaven/Minervahaven
+Minervahaven-Noordwest,Coenhaven/Minervahaven
+Minervahaven-Zuidwest,Coenhaven/Minervahaven
+Minervahaven-Zuidoost,Coenhaven/Minervahaven
+Alfa-driehoek,Coenhaven/Minervahaven
+Hemknoop-Noord,Coenhaven/Minervahaven
+Isolatorbuurt,Sloterdijk-West
+Contactbuurt,Sloterdijk-West
+Woon- en Groengebied Sloterdijk,Sloterdijk-West
+Hemknoop-Zuid,Spaarndammerbuurt/Zeeheldenbuurt
+Overbraker Binnenpolder,Spaarndammerbuurt/Zeeheldenbuurt
+Zaanstraat emplacement,Spaarndammerbuurt/Zeeheldenbuurt
+Spaarndammerbuurt-Noordwest,Spaarndammerbuurt/Zeeheldenbuurt
+Spaarndammerbuurt-Midden,Spaarndammerbuurt/Zeeheldenbuurt
+Spaarndammerbuurt-Zuidwest,Spaarndammerbuurt/Zeeheldenbuurt
+Spaarndammerbuurt-Noordoost,Spaarndammerbuurt/Zeeheldenbuurt
+Zeeheldenbuurt,Spaarndammerbuurt/Zeeheldenbuurt
+Westergasfabriek,Spaarndammerbuurt/Zeeheldenbuurt
+Spaarndammerbuurt-Zuidoost,Spaarndammerbuurt/Zeeheldenbuurt
+Houthavens-West,Houthavens
+Houthavens-Oost,Houthavens
+Kolenkitbuurt-Noord,De Kolenkit
+Kolenkitbuurt-Zuid,De Kolenkit
+Laan van Spartaan,De Kolenkit
+Robert Scottbuurt-West,De Kolenkit
+Bosleeuw,Landlust
+Gibraltarbuurt,Landlust
+Bedrijventerrein Landlust,Landlust
+Landlust-Noord,Landlust
+Erasmusparkbuurt-Oost,Landlust
+Landlust-Zuid,Landlust
+Robert Scottbuurt-Oost,Erasmuspark
+Erasmusparkbuurt-West,Erasmuspark
+Bedrijvencentrum Westerkwartier,Centrale Markt
+GWL-terrein,Centrale Markt
+Markthallen,Centrale Markt
+Marcanti,Centrale Markt
+Westerstaatsman,Staatsliedenbuurt
+Fannius Scholtenbuurt,Staatsliedenbuurt
+Staatsliedenbuurt-Noordoost,Staatsliedenbuurt
+De Wittenbuurt-Noord,Staatsliedenbuurt
+De Wittenbuurt-Zuid,Staatsliedenbuurt
+Buyskade e.o.,Staatsliedenbuurt
+Frederik Hendrikbuurt-Noord,Frederik Hendrikbuurt
+Frederik Hendrikbuurt-Zuidwest,Frederik Hendrikbuurt
+Frederik Hendrikbuurt-Zuidoost,Frederik Hendrikbuurt
+Mercatorpark,Van Galenbuurt
+Orteliusbuurt-Noord,Van Galenbuurt
+Jan Maijenbuurt,Van Galenbuurt
+John Franklinbuurt,Van Galenbuurt
+Pieter van der Doesbuurt,Geuzenbuurt
+Trompbuurt,Geuzenbuurt
+Geuzenhofbuurt,Geuzenbuurt
+Orteliusbuurt-Midden,Hoofdweg e.o.
+Balboaplein e.o.,Hoofdweg e.o.
+Orteliusbuurt-Zuid,Hoofdweg e.o.
+Columbusplein e.o.,Hoofdweg e.o.
+Filips van Almondekwartier,Chassébuurt
+Kortenaerkwartier,Chassébuurt
+Van Brakelkwartier,Chassébuurt
+De Wester Quartier,Chassébuurt
+Bellamybuurt-Noord,Bellamybuurt
+Bellamybuurt-Zuid,Bellamybuurt
+Da Costabuurt-Noord,Da Costabuurt
+Postjeskade e.o.,Westindische Buurt
+Paramariboplein e.o.,Westindische Buurt
+Lootsbuurt,Van Lennepbuurt
+Borgerbuurt,Van Lennepbuurt
+Da Costabuurt-Zuid,Van Lennepbuurt
+Cremerbuurt-West,Overtoomse Sluis
+Vondelparkbuurt-West,Overtoomse Sluis
+Cremerbuurt-Oost,Helmersbuurt
+WG-terrein,Helmersbuurt
+Helmersbuurt-Oost,Helmersbuurt
+Vondelparkbuurt-Midden,Vondelparkbuurt
+Vondelparkbuurt-Oost,Vondelparkbuurt
+Sloterdijk De Heining,Sloterdijk Nieuw-West
+Sloterdijk Poort-Noord,Sloterdijk Nieuw-West
+Sloterdijk Poort-Zuid,Sloterdijk Nieuw-West
+Sloterdijk Rhônepark,Sloterdijk Nieuw-West
+Sloterdijk Donauhoek,Sloterdijk Nieuw-West
+Bretten-West,Sloterdijk Nieuw-West
+Bretten-Oost,Sloterdijk Nieuw-West
+Sloterdijk Stationskwartier,Sloterdijk Nieuw-West
+Osdorper Binnenpolder,Geuzenveld
+De Eendracht,Geuzenveld
+Ruys de Beerenbrouckbuurt,Geuzenveld
+Eendrachtspark,Geuzenveld
+Van Tijenbuurt,Geuzenveld
+Dudokbuurt,Geuzenveld
+Bakemabuurt,Geuzenveld
+Wegener Sleeswijkbuurt,Geuzenveld
+Jan de Louterbuurt,Slotermeer-West
+Lodewijk van Deysselbuurt,Slotermeer-West
+Confuciusbuurt,Slotermeer-West
+Arondeusbuurt,Slotermeer-Noordoost
+Coronelbuurt,Slotermeer-Noordoost
+Meerwaldtbuurt,Slotermeer-Noordoost
+Dobbebuurt,Slotermeer-Noordoost
+Dichtersbuurt,Slotermeer-Zuidoost
+Louis Couperusbuurt,Slotermeer-Zuidoost
+Noordoever Sloterplas,Slotermeer-Zuidoost
+Sloterpark,Slotermeer-Zuidoost
+Osdorper Bovenpolder,Lutkemeer/Ookmeer
+Ookmeer,Lutkemeer/Ookmeer
+Bedrijvenpark Lutkemeer,Lutkemeer/Ookmeer
+Middelveldsche Akerpolder,De Aker
+De Aker-West,De Aker
+De Aker-Oost,De Aker
+Bedrijvencentrum Osdorp,De Punt
+Dijkgraafpleinbuurt,De Punt
+Reimerswaal,Osdorp-Midden
+Botteskerkbuurt,Osdorp-Midden
+Zuidwestkwadrant-Noord,Osdorp-Midden
+Zuidwestkwadrant-Zuid,Osdorp-Midden
+Wildeman,Osdorp-Oost
+Meer en Oever,Osdorp-Oost
+Osdorpplein e.o.,Osdorp-Oost
+Calandlaan/Lelylaan,Osdorp-Oost
+Osdorp-Zuidoost,Osdorp-Oost
+Oostoever Sloterplas,Slotervaart-Noord
+Emanuel van Meterenbuurt,Slotervaart-Noord
+Jacob Geelbuurt,Slotervaart-Noord
+Lucas/Andreasziekenhuis e.o.,Overtoomse Veld
+Overtoomse Veld-Noord,Overtoomse Veld
+Rembrandtpark-Noord,Overtoomse Veld
+Overtoomse Veld-Zuid,Overtoomse Veld
+Rembrandtpark-Zuid,Overtoomse Veld
+Johan Jongkindbuurt,Overtoomse Veld
+Louis Crispijnbuurt,Slotervaart-Zuid
+Jacques Veltmanbuurt,Slotervaart-Zuid
+Medisch Centrum Slotervaart,Slotervaart-Zuid
+Staalmanbuurt,Slotervaart-Zuid
+Schipluidenbuurt,Westlandgracht
+Koningin Wilhelminaplein,Westlandgracht
+Andreasterrein,Westlandgracht
+Delflandpleinbuurt-West,Westlandgracht
+Delflandpleinbuurt-Oost,Westlandgracht
+Riekerhaven,Westlandgracht
+Dorp Sloten,Sloten/Nieuw-Sloten
+Nieuw-Sloten-Noordwest,Sloten/Nieuw-Sloten
+Nieuw-Sloten-Noordoost,Sloten/Nieuw-Sloten
+Nieuw-Sloten-Zuidwest,Sloten/Nieuw-Sloten
+Belgiëplein e.o.,Sloten/Nieuw-Sloten
+Nieuw-Sloten-Zuidoost,Sloten/Nieuw-Sloten
+Sloterweg e.o.,Sloten/Nieuw-Sloten
+Park Haagseweg,Sloten/Nieuw-Sloten
+Riekerpolder,Sloten/Nieuw-Sloten
+Nieuwe Meer,Sloten/Nieuw-Sloten
+Westlandgrachtbuurt,Hoofddorppleinbuurt
+Surinamepleinbuurt,Hoofddorppleinbuurt
+Legmeerpleinbuurt,Hoofddorppleinbuurt
+Aalsmeerwegbuurt-West,Hoofddorppleinbuurt
+Aalsmeerwegbuurt-Oost,Hoofddorppleinbuurt
+Bedrijventerrein Schinkel,Hoofddorppleinbuurt
+Schinkelbuurt-Noord,Schinkelbuurt
+Schinkelbuurt-Zuid,Schinkelbuurt
+Vondelpark-West,Willemspark
+Willemsparkbuurt-Noord,Willemspark
+Valeriusbuurt-West,Willemspark
+Valeriusbuurt-Oost,Willemspark
+Vondelpark-Oost,Museumkwartier
+Cornelis Schuytbuurt,Museumkwartier
+Concertgebouwbuurt,Museumkwartier
+P.C. Hooftbuurt,Museumkwartier
+Museumplein,Museumkwartier
+Banpleinbuurt,Museumkwartier
+Hondecoeterbuurt,Museumkwartier
+Johannes Vermeerbuurt,Museumkwartier
+Duivelseiland,Museumkwartier
+Harmoniehofbuurt,Museumkwartier
+Frans Halsbuurt,Oude Pijp
+Gerard Doubuurt,Oude Pijp
+Hercules Seghersbuurt,Oude Pijp
+Sarphatiparkbuurt,Oude Pijp
+Hemonybuurt,Oude Pijp
+Cornelis Troostbuurt,Nieuwe Pijp
+Lizzy Ansinghbuurt,Nieuwe Pijp
+Van der Helstpleinbuurt,Nieuwe Pijp
+Willibrordusbuurt,Nieuwe Pijp
+BurgemeesterTellegenbuurt-West,Zuid Pijp
+Burgemeester Tellegenbuurt-Oost,Zuid Pijp
+Diamantbuurt,Zuid Pijp
+Bertelmanpleinbuurt,Stadionbuurt
+Olympisch Stadion e.o.,Stadionbuurt
+Marathonbuurt-West,Stadionbuurt
+Marathonbuurt-Oost,Stadionbuurt
+Van Tuyllbuurt,Stadionbuurt
+IJsbaanpad e.o.,Stadionbuurt
+Hiltonbuurt,Apollobuurt
+Minervabuurt-Noord,Apollobuurt
+Minervabuurt-Midden,Apollobuurt
+Minervabuurt-Zuid,Apollobuurt
+Beethovenbuurt,Apollobuurt
+Diepenbrockbuurt,Apollobuurt
+Wielingenbuurt,Scheldebuurt
+Scheldebuurt-West,Scheldebuurt
+Scheldebuurt-Midden,Scheldebuurt
+Scheldebuurt-Oost,Scheldebuurt
+Veluwebuurt,Scheldebuurt
+Kop Zuidas,Scheldebuurt
+IJselbuurt-West,IJselbuurt
+IJselbuurt-Oost,IJselbuurt
+Kromme Mijdrechtbuurt,Rijnbuurt
+Rijnbuurt-West,Rijnbuurt
+Rijnbuurt-Midden,Rijnbuurt
+Rijnbuurt-Oost,Rijnbuurt
+Zorgvlied,Rijnbuurt
+Prinses Irenebuurt,Prinses Irenebuurt e.o.
+Beatrixpark,Prinses Irenebuurt e.o.
+Zuidas-Noord,Zuidas
+RAI,Zuidas
+VU-kwartier,Zuidas
+Zuidas-Zuid,Zuidas
+Vivaldi,Zuidas
+Amsterdamse Bos,Buitenveldert-West
+Zuiderhof,Buitenveldert-West
+Buitenveldert-West-Midden,Buitenveldert-West
+Gelderlandpleinbuurt,Buitenveldert-West
+Buitenveldert-Zuidwest,Buitenveldert-West
+Buitenveldert-Zuid-Midden,Buitenveldert-West
+De Klenckebuurt,Buitenveldert-Oost
+Buitenveldert-Oost-Midden,Buitenveldert-Oost
+Buitenveldert-Zuidoost,Buitenveldert-Oost
+Amstelpark,Buitenveldert-Oost
+Java-eiland,Oostelijk Havengebied
+KNSM-eiland,Oostelijk Havengebied
+Oostelijke Handelskade,Oostelijk Havengebied
+Rietlanden,Oostelijk Havengebied
+Sporenburg,Oostelijk Havengebied
+Borneo,Oostelijk Havengebied
+Entrepot-Noordwest,Oostelijk Havengebied
+Bedrijvengebied Veelaan,Oostelijk Havengebied
+Architectenbuurt,Oostelijk Havengebied
+Cruquiusbuurt,Oostelijk Havengebied
+Bedrijvengebied Zeeburgerkade,Oostelijk Havengebied
+Weesperzijde-Noord,Weesperzijde
+Weesperzijde-Midden/Zuid,Weesperzijde
+Parooldriehoek,Weesperzijde
+Oosterparkbuurt-Noordwest,Oosterparkbuurt
+Oosterpark,Oosterparkbuurt
+Oosterparkbuurt-Zuidwest,Oosterparkbuurt
+Oosterparkbuurt-Zuidoost,Oosterparkbuurt
+Transvaalbuurt-West,Transvaalbuurt
+Transvaalbuurt-Oost,Transvaalbuurt
+Dapperbuurt-Noord,Dapperbuurt
+Dapperbuurt-Zuid,Dapperbuurt
+Oostpoort,Dapperbuurt
+Timorpleinbuurt-Noord,Indische Buurt-West
+Timorpleinbuurt-Zuid,Indische Buurt-West
+Ambonpleinbuurt,Indische Buurt-West
+Makassarpleinbuurt,Indische Buurt-Oost
+Zeeburgerdijk-Oost,Indische Buurt-Oost
+Sumatraplantsoenbuurt,Indische Buurt-Oost
+Flevopark,Indische Buurt-Oost
+Sluisbuurt,Zeeburgereiland/Bovendiep
+Sportheldenbuurt,Zeeburgereiland/Bovendiep
+Oostpunt Zeeburgereiland,Zeeburgereiland/Bovendiep
+Baaibuurt-West,Zeeburgereiland/Bovendiep
+Baaibuurt-Oost,Zeeburgereiland/Bovendiep
+Bovendiep/Diemerpark,Zeeburgereiland/Bovendiep
+Steigereiland-Zuid,IJburg-West
+Steigereiland-Noord,IJburg-West
+Rieteilanden-West,IJburg-West
+Joris Ivenspleinbuurt,IJburg-West
+Ed Pelsterparkbuurt,IJburg-West
+Centrumeiland,IJburg-Oost
+Havenkwartier IJburg,IJburg-Zuid
+Theo van Goghparkbuurt,IJburg-Zuid
+Rieteiland-Oost,IJburg-Zuid
+Van der Kunbuurt,Frankendael
+De Eenhoorn,Frankendael
+Don Bosco,Frankendael
+Julianapark,Frankendael
+Frankendael,Frankendael
+Tuindorp Amstelstation,Frankendael
+De Wetbuurt,Frankendael
+Tuindorp Frankendael,Frankendael
+Linnaeusparkbuurt,Middenmeer
+Middenmeer-Noord,Middenmeer
+Middenmeer-Zuid,Middenmeer
+Science Park-Noord,Middenmeer
+Science Park-Zuid,Middenmeer
+Sportpark Middenmeer-Zuid,Middenmeer
+Sportpark Middenmeer-Noord,Middenmeer
+Park de Meer,Middenmeer
+Sportpark Voorland,Middenmeer
+Drieburg,Betondorp
+Nieuwe Oosterbegraafplaats,Betondorp
+Betondorp,Betondorp
+De Omval,Omval/Overamstel
+Overamstel,Omval/Overamstel
+Amstelglorie,Omval/Overamstel
+Amstelkwartier-West,Omval/Overamstel
+Amstelkwartier-Noord,Omval/Overamstel
+Amstelkwartier-Zuid,Omval/Overamstel
+Weespertrekvaart,Omval/Overamstel
+Noorder IJplas,Oostzanerwerf
+Melkweg/Oostzanerwerf,Oostzanerwerf
+Walvisbuurt,Oostzanerwerf
+Twiske-West,Oostzanerwerf
+Oostzanerdijk,Oostzanerwerf
+Circus/Kermisbuurt,Oostzanerwerf
+Molenwijk,Oostzanerwerf
+Cornelis Douwesterrein-West,Noordelijke IJ-oevers-West
+Cornelis Douwesterrein-Oost,Noordelijke IJ-oevers-West
+NDSM terrein,Noordelijke IJ-oevers-West
+Buiksloterham-Zuid,Noordelijke IJ-oevers-West
+Buiksloterham-Noord,Noordelijke IJ-oevers-West
+Klaprozenbuurt,Noordelijke IJ-oevers-West
+Overhoeks,Noordelijke IJ-oevers-West
+Tuindorp Oostzaan-West,Tuindorp Oostzaan
+Tuindorp Oostzaan-Oost,Tuindorp Oostzaan
+Terrasdorp,Tuindorp Oostzaan
+De Bongerd,Tuindorp Oostzaan
+Twiske-Oost,Kadoelen
+Kadoelen,Kadoelen
+Banne-Noordwest,Banne Buiksloot
+Banne-Noordoost,Banne Buiksloot
+Banne-Zuidwest,Banne Buiksloot
+Banne-Zuidoost,Banne Buiksloot
+Buiksloterbreek,Banne Buiksloot
+Marjoleinterrein,Banne Buiksloot
+Buiksloterdijk-West,Nieuwendammerdijk/Buiksloterdijk
+Buiksloterdijk-Oost,Nieuwendammerdijk/Buiksloterdijk
+Nieuwendammerdijk-West,Nieuwendammerdijk/Buiksloterdijk
+Nieuwendammerdijk-Oost,Nieuwendammerdijk/Buiksloterdijk
+Nieuwendammerdijk-Zuid,Nieuwendammerdijk/Buiksloterdijk
+Elzenhagen-Noord,Elzenhagen
+Elzenhagen-Zuid,Elzenhagen
+Nintemanterrein,Elzenhagen
+Buikslotermeer-Noord,Buikslotermeer
+De Kleine Wereld,Buikslotermeer
+Loenermark,Buikslotermeer
+Buikslotermeerplein,Buikslotermeer
+Plan van Gool,Buikslotermeer
+Rode Kruisbuurt,Buikslotermeer
+Markengouw-Noord,Waterlandpleinbuurt
+Markengouw-Midden,Waterlandpleinbuurt
+Markengouw-Zuid,Waterlandpleinbuurt
+Werengouw-Noord,Waterlandpleinbuurt
+Werengouw-Midden,Waterlandpleinbuurt
+Werengouw-Zuid,Waterlandpleinbuurt
+Bloemenbuurt-Noord,Volewijck
+Bloemenbuurt-Zuid,Volewijck
+Van der Pekbuurt,Volewijck
+Vogelbuurt-Noord,IJplein/Vogelbuurt
+Vliegenbos,IJplein/Vogelbuurt
+Vogelbuurt-Zuid,IJplein/Vogelbuurt
+IJplein e.o.,IJplein/Vogelbuurt
+Blauwe Zand,Tuindorp Buiksloot
+Tuindorp Nieuwendam-West,Tuindorp Nieuwendam
+Tuindorp Nieuwendam-Oost,Tuindorp Nieuwendam
+Hamerstraatkwartier-West,Noordelijke IJ-oevers-Oost
+Hamerstraatkwartier-Oost,Noordelijke IJ-oevers-Oost
+Bedrijventerrein Nieuwendammerdijk,Noordelijke IJ-oevers-Oost
+Noorderstrook-West,Waterland
+Noorderstrook-Oost,Waterland
+Zunderdorp,Waterland
+Schellingwoude-West,Waterland
+Schellingwoude-Oost,Waterland
+Schellingwoude-Noord,Waterland
+Zwarte Gouw,Waterland
+Holysloot,Waterland
+Ransdorp,Waterland
+Durgerdam,Waterland
+Landelijk gebied Driemond,Driemond
+Dorp Driemond,Driemond
+Weespersluis-Noord,Bloemendalerpolder
+Waterrijk,Bloemendalerpolder
+Lanenrijk,Bloemendalerpolder
+Vechtrijk,Bloemendalerpolder
+Leeuwenveld,Bloemendalerpolder
+Bedrijventerrein Nijverheidslaan,Bloemendalerpolder
+Bedrijventerrein-Noord Weesp,Weesp-Noordwest
+Hogewey-Noord,Weesp-Noordwest
+Hogewey-Midden,Weesp-Noordwest
+Hogewey-Zuid,Weesp-Noordwest
+Weesp Dichtersbuurt,Weesp-Noordwest
+Weesp Schildersbuurt,Weesp-Noordwest
+Herensingelkwartier,Weesp Binnenstad/Zuid
+Bedrijventerrein Van Houten,Weesp Binnenstad/Zuid
+Weesp Centrum,Weesp Binnenstad/Zuid
+Weesp-Zuid I,Weesp Binnenstad/Zuid
+Weesp-Zuid II,Weesp Binnenstad/Zuid
+De Klomp,Weesp Binnenstad/Zuid
+Aetsveldsepolder,Aetsveld/Oostelijke Vechtoever
+Aetsveld-Zuid,Aetsveld/Oostelijke Vechtoever
+Aetsveld-Noord,Aetsveld/Oostelijke Vechtoever
+Oostelijke Vechtoever,Aetsveld/Oostelijke Vechtoever
+Hoofdcentrum-Zuidoost,Amstel III/Bullewijk
+Amstel III deel C/D-Noord,Amstel III/Bullewijk
+Amstel III deel A/B-Noord,Amstel III/Bullewijk
+Amstel III deel C/D-Zuid,Amstel III/Bullewijk
+Amstel III deel A/B-Zuid,Amstel III/Bullewijk
+AMC,Amstel III/Bullewijk
+Hoge Dijk,Amstel III/Bullewijk
+Venserpolder-West,Venserpolder
+Venserpolder-Oost,Venserpolder
+D-buurt,Amsterdamse Poort e.o.
+F-buurt,Amsterdamse Poort e.o.
+Amsterdamse Poort,Amsterdamse Poort e.o.
+Vogeltjeswei,Amsterdamse Poort e.o.
+Nelson Mandelapark,Amsterdamse Poort e.o.
+Hoptille,H-buurt
+Rechte H-buurt,H-buurt
+Hakfort/Huigenbos,H-buurt
+Huntum,H-buurt
+E-buurt,Ganzenhoef e.o.
+G-buurt-West,Ganzenhoef e.o.
+G-buurt-Noord,Ganzenhoef e.o.
+G-buurt-Oost,Geerdinkhof/Kantershof
+Grunder/Koningshoef,Geerdinkhof/Kantershof
+Kantershof,Geerdinkhof/Kantershof
+Bijlmermuseum-Noord,Bijlmermuseum
+Bijlmermuseum-Zuid,Bijlmermuseum
+De Kameleon e.o.,Bijlmermuseum
+Gooise Kant,K-buurt
+Kortvoort,K-buurt
+Kelbergen,K-buurt
+K-buurt-Zuidwest,K-buurt
+K-buurt-Zuidoost,K-buurt
+Holendrecht-West,Holendrecht
+Holendrecht-Oost,Holendrecht
+Holendrecht-Zuid,Holendrecht
+L-buurt,Nellestein
+Gaasperpark,Nellestein
+Gaasperplas,Nellestein
+Reigersbos 1,Reigersbos
+Reigersbos 2,Reigersbos
+Reigersbos 3,Reigersbos
+Reigersbos 4,Reigersbos
+Gein 1,Gein
+Gein 2,Gein
+Gein 3,Gein
+Gein 4,Gein
