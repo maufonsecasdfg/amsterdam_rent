@@ -24,7 +24,7 @@ try:
 
     job_config = bigquery.LoadJobConfig(
         schema=[
-            bigquery.SchemaField("source", "STRING"),
+            bigquery.SchemaField("page_source", "STRING"),
             bigquery.SchemaField("scrape_date", "DATE"),
             bigquery.SchemaField("post_type", "STRING"),
             bigquery.SchemaField("city", "STRING"),
@@ -54,13 +54,16 @@ try:
     WHEN MATCHED THEN
     UPDATE SET 
         property.last_scrape_date = DATE("{current_date}")
+        property.price_type = tmp.price_type,
+        property.location = tmp.location,
+        property.surface_unit - tmp.surface_unit
     WHEN NOT MATCHED THEN
     INSERT (
-        source, post_type, city, location, postcode, title, property_type, price, price_type, 
+        page_source, post_type, city, location, postcode, title, property_type, price, price_type, 
         surface, surface_unit, rooms, furnished, url, first_scrape_date, last_scrape_date
     )
     VALUES (
-        tmp.source, tmp.post_type, tmp.city, tmp.location, tmp.postcode, 
+        tmp.page_source, tmp.post_type, tmp.city, tmp.location, tmp.postcode, 
         tmp.title, tmp.property_type, tmp.price, tmp.price_type, tmp.surface, tmp.surface_unit, tmp.rooms, 
         tmp.furnished, tmp.url, DATE("{current_date}"), DATE("{current_date}")
     )
@@ -71,4 +74,4 @@ try:
     client.delete_table(tmp_table_id, not_found_ok=True)
         
 except Exception as e:
-    logging.error(f"Scraper error: {e}")
+    logging.exception(f"Scraper error: {e}")

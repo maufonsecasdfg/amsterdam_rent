@@ -75,7 +75,7 @@ class Scraper():
                         #proxies = {"http://": proxy_url, "https://": proxy_url}
                         try:
                             #response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True, proxies=proxies)
-                            response = httpx.get(base_url+f'page-{page}', headers=headers)
+                            response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True)
                         except httpx.TimeoutException as errt:
                             logging.info('                Timeout Error, retrying...')
                             err = errt
@@ -85,6 +85,11 @@ class Scraper():
                         except httpx.ConnectError as errc:
                             logging.info('                Connection Error, retrying...')
                             err = errc
+                            tries += 1
+                            time.sleep(1 + 10*random.random())
+                            continue
+                        if page != 1 and response.url == base_url[:-1]:
+                            logging.info('Redirected, trying again')
                             tries += 1
                             time.sleep(1 + 10*random.random())
                             continue
@@ -133,7 +138,7 @@ class Scraper():
                         for p in page_propts:
                             data['page_source'].append('Pararius')
                             data['scrape_date'].append(date.today())
-                            data['city'].append(city)
+                            data['city'].append(city.capitalize())
                             data['post_type'].append(post_type)
                             pc = p.find('div',class_="listing-search-item__sub-title'")
                             if pc is not None:
