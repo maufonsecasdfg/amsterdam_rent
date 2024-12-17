@@ -53,10 +53,10 @@ try:
     ON property.url = tmp.url
     WHEN MATCHED THEN
     UPDATE SET 
-        property.last_scrape_date = DATE("{current_date}")
+        property.last_scrape_date = DATE("{current_date}"),
         property.price_type = tmp.price_type,
         property.location = tmp.location,
-        property.surface_unit - tmp.surface_unit
+        property.surface_unit = tmp.surface_unit
     WHEN NOT MATCHED THEN
     INSERT (
         page_source, post_type, city, location, postcode, title, property_type, price, price_type, 

@@ -53,7 +53,7 @@ class Scraper():
         return random.choice(proxies)
 
     def scrape(self, city, site, post_type):
-        types = []
+        types = ['rent']
         if post_type == 'Buy':
             types = ['appartement','huis','studio']
         if site == 'pararius':
