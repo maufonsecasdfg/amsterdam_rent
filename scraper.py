@@ -12,6 +12,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+max_tries = 5
 
 with open('config/bigquery_config.json', 'r') as f:
     bigquery_config = json.load(f)
@@ -51,24 +52,25 @@ class Scraper():
         proxies = self.get_proxies_from_secret(secret_name)
         return random.choice(proxies)
 
-    def scrape(self, city, site, post_type, max_pages=10000):
+    def scrape(self, city, site, post_type):
         types = []
         if post_type == 'Buy':
             types = ['appartement','huis','studio']
         if site == 'pararius':
             for typ in types:
                 if post_type == 'Rent':
-                    logging.info('            Running all for rent')
+                    logging.info('Running all for rent')
                     base_url = f'https://www.pararius.com/apartments/{city}/'
                 elif post_type == 'Buy':
-                    logging.info(f'            Running property type: {typ}')
+                    logging.info(f'Running property type: {typ}')
                     base_url = f'https://www.pararius.nl/koopwoningen/{city}/{typ}/'
                 page = 1
+                max_pages = 100 # placeholder
                 while page <= max_pages:
                     tries = 0
                     err = None
-                    while tries <= 15:
-                        logging.info(f'            Page: {page}')
+                    while tries <= max_tries:
+                        logging.info(f'Page: {page}')
                         headers = self.generate_headers()
                         #proxy_list_secret_name = "proxy-list" 
                         #proxy_url = self.get_random_proxy(proxy_list_secret_name)
@@ -77,13 +79,13 @@ class Scraper():
                             #response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True, proxies=proxies)
                             response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True)
                         except httpx.TimeoutException as errt:
-                            logging.info('                Timeout Error, retrying...')
+                            logging.info('Timeout Error, retrying...')
                             err = errt
                             tries += 1
                             time.sleep(1 + 10*random.random())
                             continue
                         except httpx.ConnectError as errc:
-                            logging.info('                Connection Error, retrying...')
+                            logging.info('Connection Error, retrying...')
                             err = errc
                             tries += 1
                             time.sleep(1 + 10*random.random())
@@ -104,12 +106,12 @@ class Scraper():
                         else:
                             tries += 1
                             time.sleep(1 + 10*random.random())
-                    if tries == 15:
+                    if tries == max_tries:
                         if err is None:
-                            logging.info('            Reached final page (tries route).')
+                            logging.info('Reached final page (tries route).')
                             break
                         else:
-                            logging.info(f'            Tries exceeded with error: {err}')
+                            logging.info(f'Tries exceeded with error: {err}')
                             page += 1
                             time.sleep(1 + 10*random.random())
                             continue
@@ -117,6 +119,10 @@ class Scraper():
                     response.encoding = 'utf-8' 
                     soup = BeautifulSoup(response.text,'html.parser')
                     page_propts = soup.find_all('li', class_="search-list__item search-list__item--listing")
+                    if page == 1:
+                        pagination = soup.find_all('a', class_="pagination__link")
+                        max_pages = int(pagination[-2].text)
+                        logging.info(f'Total pages: {max_pages}')
 
                     if len(page_propts) != 0:
                         data = {'page_source': [],
@@ -191,18 +197,18 @@ class Scraper():
                         time.sleep(1 + 10*random.random())
                         page += 1
                     else:
-                        logging.info('            Reached final page (no properties route).')
+                        logging.info('Reached final page (no properties route).')
                         break
 
-    def run(self, cities, sites, post_types, max_pages=10000):
+    def run(self, cities, sites, post_types):
         cities, sites, post_types
         for site in sites:
             logging.info(f'Running Site: {site}')
             for post_type in post_types:
-                logging.info(f'    Running post types: {post_type}')
+                logging.info(f'Running post types: {post_type}')
                 for city in cities:
-                    logging.info(f'        Running city: {city}')
-                    self.scrape(city, site, post_type, max_pages)
+                    logging.info(f'Running city: {city}')
+                    self.scrape(city, site, post_type)
         self.properties = self.properties.drop_duplicates()
         self.properties = self.properties.dropna(subset=['price', 'surface', 'rooms'])
         self.properties['price'] = self.properties['price'].astype(int)
