@@ -24,8 +24,8 @@ def fetch_data():
 
 def generate_stadsdeel_subdivision_map(df):
     subdivision_stadsdeel_map = df[['stadsdeel','stadsdeel_onderverdeling']].drop_duplicates().set_index('stadsdeel_onderverdeling').to_dict('index')
-    subdivion_stadsdeel_map = {s : subdivision_stadsdeel_map[s]['stadsdeel'] for s in subdivision_stadsdeel_map}
-    return subdivion_stadsdeel_map
+    subdivision_stadsdeel_map = {s : subdivision_stadsdeel_map[s]['stadsdeel'] for s in subdivision_stadsdeel_map}
+    return subdivision_stadsdeel_map
 
 def process_data(df):
     df = df.copy()
@@ -64,10 +64,11 @@ def remove_outliers(df, column_name, percentile_bounds):
     )]
     return processed_df
 
-def compute_statistics(df, column_name, post_type, property_type, furnished, region_resolution, percentile_bounds, subdivion_stadsdeel_map):
+def compute_statistics(df, column_name, post_type, property_type, furnished, region_resolution, percentile_bounds, subdivision_stadsdeel_map):
     stats = []
     df_s = df.copy()
     df_s[f'log_{column_name}'] = np.log(df_s[column_name])
+    df_s = df_s[df_s['post_type']==post_type]
     if property_type != 'All':
         df_s = df_s[df_s['property_type'] == property_type]
     if post_type == 'Rent':
@@ -78,14 +79,15 @@ def compute_statistics(df, column_name, post_type, property_type, furnished, reg
             stadsdeel = region
             subdivision = None
         elif region_resolution == 'stadsdeel_onderverdeling':
-            stadsdeel = subdivion_stadsdeel_map[region]
+            stadsdeel = subdivision_stadsdeel_map[region]
             subdivision = region
         df_r = df_s[df_s[region_resolution]==region]
         property_count = len(df_r)
-        if property_count < 10:
-            continue
         
         processed_df = remove_outliers(df_r, f'log_{column_name}', percentile_bounds)
+        
+        if len(processed_df) < 10:
+            continue
         
         median = processed_df[column_name].median()
         q1 = processed_df[column_name].quantile(0.25)
@@ -126,7 +128,7 @@ def compute_statistics(df, column_name, post_type, property_type, furnished, reg
     stats_df = pd.DataFrame(stats)
     return stats_df
 
-def run_stats_computation(df, percentile_bounds, subdivion_stadsdeel_map):
+def run_stats_computation(df, percentile_bounds, subdivision_stadsdeel_map):
     stats_df = pd.DataFrame()
     for region_resolution in ['stadsdeel', 'stadsdeel_onderverdeling']:
         for post_type in ['Buy', 'Rent']:
@@ -145,7 +147,7 @@ def run_stats_computation(df, percentile_bounds, subdivion_stadsdeel_map):
                                 furnished = furnished,
                                 region_resolution=region_resolution,
                                 percentile_bounds=percentile_bounds,
-                                subdivion_stadsdeel_map=subdivion_stadsdeel_map
+                                subdivision_stadsdeel_map=subdivision_stadsdeel_map
                             )
                         stats_df = pd.concat([stats_df,s])
     return stats_df
