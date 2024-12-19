@@ -3,15 +3,15 @@ import pandas as pd
 import numpy as np
 import json
 
-def fetch_data():
+def fetch_data(bigquery_config):
     client = bigquery.Client()
 
-    query = """
+    query = f"""
     SELECT 
     p.*,
     q.*
-    FROM `amsterdamrent-354519.prod.property` p
-    LEFT JOIN `amsterdamrent-354519.prod.postcode_gwb` q
+    FROM `{bigquery_config['project_id']}.{bigquery_config['dataset_id']}.property` p
+    LEFT JOIN `{bigquery_config['project_id']}.{bigquery_config['dataset_id']}.postcode_gwb` q
     ON p.postcode = q.postcode
     """
 
@@ -64,7 +64,8 @@ def remove_outliers(df, column_name, percentile_bounds):
     )]
     return processed_df
 
-def compute_statistics(df, column_name, post_type, property_type, furnished, region_resolution, percentile_bounds, subdivision_stadsdeel_map):
+def compute_statistics(df, column_name, post_type, property_type, furnished, region_resolution, 
+                       percentile_bounds, subdivision_stadsdeel_map, min_properties_to_compute_stats):
     stats = []
     df_s = df.copy()
     df_s[f'log_{column_name}'] = np.log(df_s[column_name])
@@ -86,13 +87,26 @@ def compute_statistics(df, column_name, post_type, property_type, furnished, reg
         
         processed_df = remove_outliers(df_r, f'log_{column_name}', percentile_bounds)
         
-        if len(processed_df) < 10:
-            continue
+        if len(processed_df) < min_properties_to_compute_stats:
+            stats.append({
+            'region_resolution': region_resolution,
+            'stadsdeel': stadsdeel,
+            'subdivision': subdivision,
+            'post_type': post_type,
+            'property_type': property_type,
+            'furnished': furnished,
+            'value': column_name,
+            'number_of_properties': property_count
+        })
         
         median = processed_df[column_name].median()
         q1 = processed_df[column_name].quantile(0.25)
         q3 = processed_df[column_name].quantile(0.75)
-        mode = processed_df[column_name].mode().iloc[0]
+        mode = processed_df[column_name].mode()
+        if len(mode) == 1:
+            mode = mode.iloc[0]
+        else:
+            mode = None
         log_mean = processed_df[f'log_{column_name}'].mean()
         log_std = processed_df[f'log_{column_name}'].std()
         geometric_mean = np.exp(log_mean)
@@ -128,7 +142,7 @@ def compute_statistics(df, column_name, post_type, property_type, furnished, reg
     stats_df = pd.DataFrame(stats)
     return stats_df
 
-def run_stats_computation(df, percentile_bounds, subdivision_stadsdeel_map):
+def run_stats_computation(df, percentile_bounds, subdivision_stadsdeel_map, min_properties_to_compute_stats):
     stats_df = pd.DataFrame()
     for region_resolution in ['stadsdeel', 'stadsdeel_onderverdeling']:
         for post_type in ['Buy', 'Rent']:
@@ -147,7 +161,8 @@ def run_stats_computation(df, percentile_bounds, subdivision_stadsdeel_map):
                                 furnished = furnished,
                                 region_resolution=region_resolution,
                                 percentile_bounds=percentile_bounds,
-                                subdivision_stadsdeel_map=subdivision_stadsdeel_map
+                                subdivision_stadsdeel_map=subdivision_stadsdeel_map,
+                                min_properties_to_compute_stats=min_properties_to_compute_stats
                             )
                         stats_df = pd.concat([stats_df,s])
     return stats_df
@@ -198,12 +213,13 @@ def main():
         bigquery_config = json.load(f)
     
     percentile_bounds = [stats_config['outliers_percentile_lower'], stats_config['outliers_percentile_upper']]
+    min_properties_to_compute_stats = stats_config['min_properties_to_compute_stats']
     
-    df = fetch_data()
+    df = fetch_data(bigquery_config)
     stadsdeel_subdivision_map = generate_stadsdeel_subdivision_map(df)
     processed_df = process_data(df)
     
-    stats_df = run_stats_computation(processed_df, percentile_bounds, stadsdeel_subdivision_map)
+    stats_df = run_stats_computation(processed_df, percentile_bounds, stadsdeel_subdivision_map, min_properties_to_compute_stats)
     
     upload_dataframe_to_bigquery(stats_df, bigquery_config)
     
