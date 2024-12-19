@@ -9,6 +9,8 @@ import shutil
 from shapely import wkt
 from shapely.geometry import MultiPolygon, Polygon
 
+# GWB: Gemeente - Wijk - Buurt
+
 # Data from https://www.cbs.nl/nl-nl/maatwerk/2024/35/buurt-wijk-en-gemeente-2024-voor-postcode-huisnummer and https://www.cbs.nl/nl-nl/dossier/nederland-regionaal/geografische-data/wijk-en-buurtkaart-2024
 
 def generate_postcode_gwb_and_geodata_tables(selected_gemeenten, tmp_dir, output_dir, buurt_to_stadsdeel_mapping_path=None):

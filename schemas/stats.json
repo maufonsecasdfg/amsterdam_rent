@@ -1,0 +1,22 @@
+{
+    "region_resolution": "STRING",
+    "stadsdeel": "STRING",
+    "subdivision": "STRING",
+    "post_type": "STRING",
+    "property_type": "STRING",
+    "furnished": "STRING",
+    "value": "STRING",
+    "median": "FLOAT",
+    "q1": "FLOAT",
+    "q3": "FLOAT",
+    "mode": "FLOAT",
+    "geometric_mean": "FLOAT",
+    "geometric_std": "FLOAT",
+    "geometric_conf_int_95_low": "FLOAT",
+    "geometric_conf_int_95_upp": "FLOAT",
+    "geometric_conf_int_75_low": "FLOAT",
+    "geometric_conf_int_75_upp": "FLOAT",
+    "geometric_conf_int_50_low": "FLOAT",
+    "geometric_conf_int_50_upp": "FLOAT",
+    "number_of_properties": "INTEGER"
+}

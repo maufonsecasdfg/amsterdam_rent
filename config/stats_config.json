@@ -1,0 +1,4 @@
+{
+    "outliers_percentile_lower": 0.01,
+    "outliers_percentile_upper": 0.99
+}
