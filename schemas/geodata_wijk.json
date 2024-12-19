@@ -1,0 +1,6 @@
+{
+    "gemeente_code":"STRING",
+    "wijk_code":"STRING",
+    "kaart_jaar":"INTEGER",
+    "geometry": "STRING"
+}

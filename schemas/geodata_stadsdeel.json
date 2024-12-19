@@ -1,0 +1,5 @@
+{
+    "gemeente_code":"STRING",
+    "stadsdeel":"STRING",
+    "geometry": "STRING"
+}

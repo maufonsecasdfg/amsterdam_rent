@@ -6,6 +6,7 @@ import zipfile
 import datetime
 import geopandas as gpd
 import shutil
+from shapely import wkt
 from shapely.geometry import MultiPolygon, Polygon
 
 # Data from https://www.cbs.nl/nl-nl/maatwerk/2024/35/buurt-wijk-en-gemeente-2024-voor-postcode-huisnummer and https://www.cbs.nl/nl-nl/dossier/nederland-regionaal/geografische-data/wijk-en-buurtkaart-2024
@@ -77,10 +78,14 @@ def generate_postcode_gwb_and_geodata_tables(selected_gemeenten, tmp_dir, output
         
         pc6_df = pd.read_csv(pc6_path, encoding='latin1', dtype=str)
         pc6_df = (
-            pc6_df.rename(columns={'PC6': 'postcode', f'Buurt{year}': 'BU_CODE', f'Wijk{year}': 'WK_CODE', f'Gemeente{year}': 'GM_CODE'})
-            .drop(columns=['Huisnummer']).
-            drop_duplicates()
+            pc6_df.rename(columns={
+                'PC6': 'postcode', 
+                f'Buurt{year}': 'BU_CODE', 
+                f'Wijk{year}': 'WK_CODE', 
+                f'Gemeente{year}': 'GM_CODE'
+                })
         )
+        
         pc6_df['GM_CODE'] = 'GM' + pc6_df['GM_CODE']
         pc6_df['WK_CODE'] = 'WK' + pc6_df['WK_CODE']
         pc6_df['BU_CODE'] = 'BU' + pc6_df['BU_CODE']
@@ -89,6 +94,56 @@ def generate_postcode_gwb_and_geodata_tables(selected_gemeenten, tmp_dir, output
         
         pc6_df = pc6_df[pc6_df['GM_CODE'].isin(gemeente_codes)]
         pc6_df['postcode'] = pc6_df['postcode'].str[:4] + ' ' + pc6_df['postcode'].str[4:]
+        
+        all_gwb = pc6_df[['BU_CODE','WK_CODE','GM_CODE']].drop_duplicates().reset_index(drop=True)
+        
+        # Unfortunately, some postcodes appear in more than one buurt.
+        # I will de-duplicate this by taking the postcode to be in the buurt with more house numbers for that postcode
+        
+        duplicated_pc = (
+            pc6_df[['postcode', 'BU_CODE']].drop_duplicates()[
+                pc6_df[['postcode', 'BU_CODE']].drop_duplicates()
+                .duplicated('postcode')]['postcode'].values
+            )
+        hn_count = (
+            pc6_df[pc6_df['postcode'].isin(duplicated_pc)]
+            .groupby(['postcode', 'BU_CODE'])[['Huisnummer']]
+            .count()
+            .reset_index()
+            )
+        hn_count_max = (
+            hn_count[hn_count['postcode'].duplicated(keep=False)]
+            .sort_values(['postcode', 'Huisnummer'], ascending=False)
+            .drop_duplicates('postcode')
+            )
+        
+        df_nonduplicated = pc6_df[~pc6_df['postcode'].isin(duplicated_pc)]
+        df_unduplicated = pc6_df[(pc6_df['postcode']+pc6_df['BU_CODE']).isin((hn_count_max['postcode']+hn_count_max['BU_CODE']).values)]
+        
+        pc6_df = pd.concat([df_nonduplicated, df_unduplicated])
+        
+        pc6_df = (
+            pc6_df
+            .drop(columns=['Huisnummer'])
+            .drop_duplicates()
+        )
+        
+        print(pc6_df.columns)
+        missing_bu = []
+        i = 1
+        for _, row in all_gwb.iterrows():
+            if row['BU_CODE'] not in pc6_df['BU_CODE'].values:
+                d = {
+                    'postcode': f'PLACEHOLDER {i}',
+                    'GM_CODE': row['GM_CODE'],
+                    'WK_CODE': row['WK_CODE'],
+                    'BU_CODE': row['BU_CODE'],
+                }
+                i += 1
+                missing_bu.append(d)
+        
+        pc6_df = pd.concat([pc6_df, pd.DataFrame(missing_bu)])
+                
         
         pc6_df = pc6_df.set_index('GM_CODE').join(gemeenten_df.set_index('GM_CODE')).reset_index()
         
@@ -134,7 +189,7 @@ def generate_postcode_gwb_and_geodata_tables(selected_gemeenten, tmp_dir, output
                             .rename(columns={
                                 'gemeentecode': 'gemeente_code',
                                 'jaar': 'kaart_jaar',
-                                'geometry_wkt': 'geometry_espg28992'
+                                'geometry_wkt': 'geometry'
                             }))
         
         gemeente_geodata.to_csv(os.path.join(output_dir, 'gemeente_geodata.csv'), index=False)
@@ -152,7 +207,7 @@ def generate_postcode_gwb_and_geodata_tables(selected_gemeenten, tmp_dir, output
                             'gemeentecode': 'gemeente_code',
                             'wijkcode': 'wijk_code',
                             'jaar': 'kaart_jaar',
-                            'geometry_wkt': 'geometry_espg28992'
+                            'geometry_wkt': 'geometry'
                         }))
         
         wijk_geodata.to_csv(os.path.join(output_dir, 'wijk_geodata.csv'), index=False)
@@ -167,17 +222,46 @@ def generate_postcode_gwb_and_geodata_tables(selected_gemeenten, tmp_dir, output
         buurt_geodata = (buurt_geodata
                         .drop(columns=['geometry'])
                         .rename(columns={
-                            'gemmentecode': 'gemeente_code',
+                            'gemeentecode': 'gemeente_code',
                             'wijkcode': 'wijk_code',
                             'buurtcode': 'buurt_code',
                             'jaar': 'kaart_jaar',
-                            'geometry_wkt': 'geometry_espg28992',
+                            'geometry_wkt': 'geometry',
                         }))
 
         buurt_geodata.to_csv(os.path.join(output_dir, 'buurt_geodata.csv'), index=False)
         print(f"Buurt geodata CSV file saved to: {os.path.join(output_dir, 'buurt_geodata.csv')}")
-
-    
+        
+        buurt_to_subdivision = pc6_df[['buurt_code', 'stadsdeel', 'stadsdeel_onderverdeling']].drop_duplicates()
+        buurt_to_stadsdeel = pc6_df[['buurt_code', 'stadsdeel']].drop_duplicates()
+        
+        def to_multipolygon(geom):
+            if geom.geom_type == 'Polygon':
+                return MultiPolygon([geom])
+            return geom
+        
+        subdivision_geodata = buurt_geodata.set_index('buurt_code').join(buurt_to_subdivision.set_index('buurt_code')).reset_index()
+        subdivision_geodata["geometry"] = subdivision_geodata["geometry"].apply(wkt.loads)
+        subdivision_geodata = subdivision_geodata[['gemeente_code', 'stadsdeel', 'stadsdeel_onderverdeling', 'geometry']]
+        subdivision_geodata = gpd.GeoDataFrame(subdivision_geodata, geometry='geometry', crs="EPSG:28992")
+        subdivision_geodata = subdivision_geodata.dissolve(by=['gemeente_code','stadsdeel','stadsdeel_onderverdeling']).reset_index()
+        subdivision_geodata['geometry'] = subdivision_geodata['geometry'].apply(to_multipolygon)
+        subdivision_geodata['geometry'] = subdivision_geodata['geometry'].apply(lambda geom: geom.wkt)
+        
+        subdivision_geodata.to_csv(os.path.join(output_dir, 'stadsdeel_onderverdeling_geodata.csv'), index=False)
+        print(f"Subdivision geodata CSV file saved to: {os.path.join(output_dir, 'stadsdeel_onderverdeling_geodata.csv')}")
+        
+        stadsdeel_geodata = buurt_geodata.set_index('buurt_code').join(buurt_to_stadsdeel.set_index('buurt_code')).reset_index()
+        stadsdeel_geodata["geometry"] = stadsdeel_geodata["geometry"].apply(wkt.loads)
+        stadsdeel_geodata = stadsdeel_geodata[['gemeente_code', 'stadsdeel', 'geometry']]
+        stadsdeel_geodata = gpd.GeoDataFrame(stadsdeel_geodata, geometry='geometry', crs="EPSG:28992")
+        stadsdeel_geodata = stadsdeel_geodata.dissolve(by=['gemeente_code','stadsdeel']).reset_index()
+        stadsdeel_geodata['geometry'] = stadsdeel_geodata['geometry'].apply(to_multipolygon)
+        stadsdeel_geodata['geometry'] = stadsdeel_geodata['geometry'].apply(lambda geom: geom.wkt)
+        
+        stadsdeel_geodata.to_csv(os.path.join(output_dir, 'stadsdeel_geodata.csv'), index=False)
+        print(f"Subdivision geodata CSV file saved to: {os.path.join(output_dir, 'stadsdeel_geodata.csv')}")
+            
     return downloaded
 
 def main():

@@ -1,0 +1,12 @@
+{
+    "postcode":"STRING",
+    "gemeente":"STRING",
+    "gemeente_code":"STRING",
+    "wijk":"STRING",
+    "wijk_code":"STRING",
+    "buurt":"STRING",
+    "buurt_code":"STRING",
+    "stadsdeel_onderverdeling":"STRING",
+    "stadsdeel":"STRING",
+    "pc6_jaar":"INTEGER"
+}
