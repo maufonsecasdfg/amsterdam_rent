@@ -195,7 +195,7 @@ def main():
     with open('config/bigquery_config.json', 'r') as f:
         bigquery_config = json.load(f)
     
-    percentile_bounds = [stats_config['outliers_percentile_lower'], stats_config['percentile_upper']]
+    percentile_bounds = [stats_config['outliers_percentile_lower'], stats_config['outliers_percentile_upper']]
     
     df = fetch_data()
     stadsdeel_subdivision_map = generate_stadsdeel_subdivision_map(df)
