@@ -114,10 +114,7 @@ def index():
     df["geometry"] = df["geometry"].apply(wkt.loads)
     gdf = gpd.GeoDataFrame(df, geometry='geometry', crs="EPSG:28992")
     gdf['stadsdeel'] = gdf['stadsdeel'].str.replace('Stadsdeel ', '',regex=False)
-       
-    # Initialize Folium map centered at a specific location
-    # Reproject to WGS84
-    #gdf = gdf.to_crs(epsg=4326)
+
 
     # Initialize map
     m = folium.Map(location=folium_config['location'], zoom_start=folium_config['zoom_start'], tiles=folium_config['tiles'])
@@ -173,7 +170,7 @@ def index():
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <title>My Folium Map with Filters</title>
+        <title>Amsterdam Real Estate Visualizer</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Bootstrap CSS (CDN) -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -318,4 +315,4 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8081)
+    app.run(host="0.0.0.0", port=8080)
