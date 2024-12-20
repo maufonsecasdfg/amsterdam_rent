@@ -1,5 +1,8 @@
 flask
 folium
+db_dtypes
 google-cloud-bigquery
 pandas
 geopandas
+shapely
+branca

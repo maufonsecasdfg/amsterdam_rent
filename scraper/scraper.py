@@ -7,7 +7,6 @@ import pandas as pd
 from datetime import date
 import re
 import chardet
-from google.cloud import secretmanager
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -42,15 +41,6 @@ class Scraper():
             price_type = ' '.join(price_text.strip().split(' ')[1:])
         return price, price_type    
     
-    def get_proxies_from_secret(self, secret_name):
-        client = secretmanager.SecretManagerServiceClient()
-        name = f"projects/{bigquery_config['project_id']}/secrets/{secret_name}/versions/latest"
-        response = client.access_secret_version(request={"name": name})
-        return json.loads(response.payload.data.decode("UTF-8"))
-
-    def get_random_proxy(self, secret_name):
-        proxies = self.get_proxies_from_secret(secret_name)
-        return random.choice(proxies)
 
     def scrape(self, city, site, post_type):
         types = ['rent']
@@ -72,11 +62,7 @@ class Scraper():
                     while tries <= max_tries:
                         logging.info(f'Page: {page}')
                         headers = self.generate_headers()
-                        #proxy_list_secret_name = "proxy-list" 
-                        #proxy_url = self.get_random_proxy(proxy_list_secret_name)
-                        #proxies = {"http://": proxy_url, "https://": proxy_url}
                         try:
-                            #response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True, proxies=proxies)
                             response = httpx.get(base_url+f'page-{page}', headers=headers, follow_redirects=True)
                         except httpx.TimeoutException as errt:
                             logging.info('Timeout Error, retrying...')
@@ -228,11 +214,9 @@ class Scraper():
             "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:110.0) Gecko/20100101 Firefox/110.0",
         ]
 
-        # Sec-Fetch headers typically reflect browser behavior.
-        # You can keep them stable for now to seem more like a normal browser.
         sec_fetch_site = random.choice(["none", "same-origin", "cross-site"])
         sec_fetch_mode = random.choice(["navigate", "cors", "no-cors", "same-origin"])
-        sec_fetch_user = "?1"  # This header often appears as "?1" when a human navigates
+        sec_fetch_user = "?1"  
 
         headers = {
             "Connection": "keep-alive",
