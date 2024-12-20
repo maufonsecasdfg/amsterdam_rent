@@ -89,15 +89,16 @@ def compute_statistics(df, column_name, post_type, property_type, furnished, reg
         
         if len(processed_df) < min_properties_to_compute_stats:
             stats.append({
-            'region_resolution': region_resolution,
-            'stadsdeel': stadsdeel,
-            'subdivision': subdivision,
-            'post_type': post_type,
-            'property_type': property_type,
-            'furnished': furnished,
-            'value': column_name,
-            'number_of_properties': property_count
-        })
+                'region_resolution': region_resolution,
+                'stadsdeel': stadsdeel,
+                'subdivision': subdivision,
+                'post_type': post_type,
+                'property_type': property_type,
+                'furnished': furnished,
+                'value': column_name,
+                'number_of_properties': property_count
+            })
+            continue
         
         median = processed_df[column_name].median()
         q1 = processed_df[column_name].quantile(0.25)

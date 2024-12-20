@@ -1,5 +1,5 @@
 {
-    "min_properties_to_compute_stats": 30,
+    "min_properties_to_compute_stats": 20,
     "outliers_percentile_lower": 0.01,
     "outliers_percentile_upper": 0.99
 }
