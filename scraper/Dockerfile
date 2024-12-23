@@ -37,13 +37,22 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     apt install -y ./google-chrome-stable_current_amd64.deb || apt-get -f install -y && \
     rm google-chrome-stable_current_amd64.deb
 
-# Dynamically fetch and install compatible ChromeDriver
+# Verify Google Chrome Version
+RUN google-chrome --version
+
+# Install Compatible ChromeDriver Dynamically
 RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d. -f1) && \
     DRIVER_VERSION=$(wget -qO- https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_${CHROME_VERSION}) && \
+    echo "Downloading ChromeDriver version: $DRIVER_VERSION" && \
     wget -O /tmp/chromedriver.zip https://storage.googleapis.com/chrome-for-testing-public/${DRIVER_VERSION}/linux64/chromedriver-linux64.zip && \
-    unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
-    rm /tmp/chromedriver.zip && \
-    chmod +x /usr/local/bin/chromedriver
+    ls -lh /tmp/chromedriver.zip && \
+    unzip /tmp/chromedriver.zip -d /tmp/ && \
+    mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver && \
+    chmod +x /usr/local/bin/chromedriver && \
+    rm -rf /tmp/chromedriver.zip /tmp/chromedriver-linux64
+
+# Verify ChromeDriver Installation
+RUN chromedriver --version
 
 # Install Python dependencies
 COPY requirements.txt .
