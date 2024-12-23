@@ -10,6 +10,7 @@ import chardet
 import logging
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -230,6 +231,8 @@ class Scraper():
                     user_agent = self.generate_headers(only_user_agent=True)
                     options.add_argument(f"user-agent={user_agent}")
 
+                    service = Service('/usr/local/bin/chromedriver')
+                    driver = webdriver.Chrome(service=service, options=options)
                     driver = webdriver.Chrome(options=options)
                     tries = 0
                     err = None
