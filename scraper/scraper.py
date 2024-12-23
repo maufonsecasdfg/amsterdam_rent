@@ -324,7 +324,11 @@ class Scraper():
                                 price_section = soup.find('p', {'data-test-id': 'price-rent'})
                             if not price_section:
                                 continue
-                            price, price_type = self.process_price(price_section.text)                
+                            price, price_type = self.process_price(price_section.text)
+                            if price_type:
+                                price_type = price_type.replace('/maand', 'per month')
+                            if not price:
+                                continue              
                             
                             surface = []
                             bedrooms = None
@@ -368,7 +372,7 @@ class Scraper():
                             data['title'].append(title)
                             data['postcode'].append(postcode)
                             data['price'].append(price)
-                            data['price_type'].append(price_type.replace('/maand', 'per month'))
+                            data['price_type'].append(price_type)                            
                             data['surface'].append(surface)
                             data['surface_unit'].append('m²')
                             data['bedrooms'].append(bedrooms)
