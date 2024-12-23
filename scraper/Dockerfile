@@ -7,6 +7,7 @@ WORKDIR /app
 # Install required dependencies for Chrome and ChromeDriver
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
+    unzip \
     gnupg \
     ca-certificates \
     fonts-liberation \
@@ -39,7 +40,7 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
 # Dynamically fetch and install compatible ChromeDriver
 RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d. -f1) && \
     DRIVER_VERSION=$(wget -qO- https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_${CHROME_VERSION}) && \
-    wget -O /tmp/chromedriver.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/${DRIVER_VERSION}/linux64/chromedriver-linux64.zip && \
+    wget -O /tmp/chromedriver.zip https://storage.googleapis.com/chrome-for-testing-public/${DRIVER_VERSION}/linux64/chromedriver-linux64.zip && \
     unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
     rm /tmp/chromedriver.zip && \
     chmod +x /usr/local/bin/chromedriver
