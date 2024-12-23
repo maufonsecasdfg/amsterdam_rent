@@ -29,24 +29,27 @@ class Scraper():
         self.properties = pd.DataFrame()
         
     def process_price(self, price_text):
-        pattern = r'.*\d[\d.,]*\s*-\s*\d[\d.,]*.*' # price range pattern
-        price_text = price_text.replace('€','').replace('\n','')
-        if bool(re.match(pattern, price_text)):
-            num1str = re.sub(r'[^\d]', '', price_text.split('-')[0])
-            num2str = re.sub(r'[^\d]', '', price_text.split('-')[1])
-            num1 = int(num1str)
-            num2 = int(num2str)
-            price = int((num1+num2)/2)
-            price_type = ' '.join(price_text.replace('.','')
-                                  .replace(',','')
-                                  .replace(num1str,'')
-                                  .replace(num2str,'')
-                                  .strip()
-                                  .split(' ')[1:]).strip()
-        else:
-            price = int(re.sub(r'[^\d]', '', price_text))
-            price_type = ' '.join(price_text.strip().split(' ')[1:])
-        return price, price_type    
+        try:
+            pattern = r'.*\d[\d.,]*\s*-\s*\d[\d.,]*.*' # price range pattern
+            price_text = price_text.replace('€','').replace('\n','')
+            if bool(re.match(pattern, price_text)):
+                num1str = re.sub(r'[^\d]', '', price_text.split('-')[0])
+                num2str = re.sub(r'[^\d]', '', price_text.split('-')[1])
+                num1 = int(num1str)
+                num2 = int(num2str)
+                price = int((num1+num2)/2)
+                price_type = ' '.join(price_text.replace('.','')
+                                    .replace(',','')
+                                    .replace(num1str,'')
+                                    .replace(num2str,'')
+                                    .strip()
+                                    .split(' ')[1:]).strip()
+            else:
+                price = int(re.sub(r'[^\d]', '', price_text))
+                price_type = ' '.join(price_text.strip().split(' ')[1:])
+            return price, price_type
+        except:
+            return None, None
     
 
     def scrape_pararius(self, city, post_type):
@@ -193,7 +196,8 @@ class Scraper():
                             data['furnished'].append(None)
 
                     df = pd.DataFrame(data)
-                    self.properties = pd.concat([self.properties,df]).reset_index(drop=True)
+                    if len(df) != 0:
+                        self.properties = pd.concat([self.properties,df]).reset_index(drop=True)
                     time.sleep(1 + 10*random.random())
                     page += 1
                 else:
@@ -258,7 +262,7 @@ class Scraper():
                                         page_numbers.append(int(a_tag.text.strip()))
                                 
                                 max_pages = max(page_numbers) if page_numbers else 1
-                                print(f"Total Pages: {max_pages}")
+                                logging.info(f"Total Pages: {max_pages}")
                             break
                             
                         except httpx.TimeoutException as errt:
@@ -374,7 +378,8 @@ class Scraper():
                         driver.quit()
 
                         df = pd.DataFrame(data)
-                        self.properties = pd.concat([self.properties,df]).reset_index(drop=True)
+                        if len(df) != 0:
+                            self.properties = pd.concat([self.properties,df]).reset_index(drop=True)
                         time.sleep(1 + 10*random.random())
                         page += 1
                     else:
