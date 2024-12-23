@@ -37,8 +37,10 @@ try:
             bigquery.SchemaField("surface", "INTEGER"),
             bigquery.SchemaField("surface_unit", "STRING"),
             bigquery.SchemaField("rooms", "INTEGER"),
+            bigquery.SchemaField("bedrooms", "INTEGER"),
             bigquery.SchemaField("furnished", "STRING"),
             bigquery.SchemaField("url", "STRING"),
+            bigquery.SchemaField("status", "STRING"),
         ],
         write_disposition="WRITE_TRUNCATE",
     )
@@ -50,25 +52,33 @@ try:
     query = f"""
     MERGE `{property_table_id}` AS property
     USING `{tmp_table_id}` AS tmp
-    ON property.url = tmp.url
+    ON property.url = tmp.url AND property.post_type = tmp.post_type
     WHEN MATCHED THEN
     UPDATE SET 
         property.last_scrape_date = DATE("{current_date}"),
     WHEN NOT MATCHED THEN
     INSERT (
         page_source, post_type, city, location, postcode, title, property_type, price, price_type, 
-        surface, surface_unit, rooms, furnished, url, first_scrape_date, last_scrape_date
+        surface, surface_unit, rooms, bedrooms, furnished, url, status, first_scrape_date, last_scrape_date
     )
     VALUES (
         tmp.page_source, tmp.post_type, tmp.city, tmp.location, tmp.postcode, 
         tmp.title, tmp.property_type, tmp.price, tmp.price_type, tmp.surface, tmp.surface_unit, tmp.rooms, 
-        tmp.furnished, tmp.url, DATE("{current_date}"), DATE("{current_date}")
+        tmp.furnished, tmp.furnished, tmp.url, tmp.status, DATE("{current_date}"), DATE("{current_date}")
     )
     """
     job = client.query(query)
     job.result()
 
     client.delete_table(tmp_table_id, not_found_ok=True)
+    
+    update_query = f"""
+        UPDATE `{property_table_id}`
+        SET status = 'Unavailable'
+        WHERE status = 'Available' AND last_scrape_date != DATE("{current_date}")
+    """
+    job = client.query(update_query)
+    job.result()
         
 except Exception as e:
     logging.exception(f"Scraper error: {e}")

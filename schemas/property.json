@@ -1,0 +1,19 @@
+{
+    "page_source": "STRING",
+    "scrape_date": "DATE",
+    "post_type": "STRING",
+    "city": "STRING",
+    "location": "STRING",
+    "postcode": "STRING",
+    "title": "STRING",
+    "property_type": "STRING",
+    "price": "INTEGER",
+    "price_type": "STRING",
+    "surface": "INTEGER",
+    "surface_unit": "STRING",
+    "rooms": "INTEGER",
+    "bedrooms": "INTEGER",
+    "furnished": "STRING",
+    "url": "STRING",
+    "status": "STRING"
+}

@@ -1,5 +1,6 @@
 {
     "cities": ["amsterdam"],
-    "sites": ["pararius"],
-    "post_types": ["Buy", "Rent"]
+    "sites": ["funda", "pararius"],
+    "post_types": ["Buy", "Rent"],
+    "scrape_unavailable": true
 }
