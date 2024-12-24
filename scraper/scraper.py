@@ -215,10 +215,8 @@ class Scraper():
         if property_type == 'House' and num_rooms == 1:
             return None, True
         if post_type == 'Rent':
-            logging.info('Running all for rent')
             base_url = f'https://www.funda.nl/zoeken/huur?selected_area=["{city}"]&object_type=["{property_type.lower()}"]&rooms="{num_rooms}-{num_rooms}"'
         elif post_type == 'Buy':
-            logging.info(f'Running all for buy')
             base_url = f'https://www.funda.nl/zoeken/koop?selected_area=["{city}"]&object_type=["{property_type.lower()}"]&rooms="{num_rooms}-{num_rooms}"'
         if scrape_unavailable:
             base_url += '&availability=["available","negotiations","unavailable"]'
@@ -388,8 +386,8 @@ class Scraper():
             else:
                 return None, False
         else:
-            logging.info('Reached page with no properties.')
-            return None, True
+            logging.info('Page not loaded properly. Retrying')
+            return self.scrape_funda(city, post_type, property_type, num_rooms, page, scrape_unavailable)
 
     def run(self, cities, sites, post_types, property_types, scrape_unavailable=False):
         overall_page_counter = 0 
@@ -402,10 +400,11 @@ class Scraper():
                             page = 1
                             total_pages = 100 # placeholder
                             finished = False
-                            while not finished:
+                            while not finished or page <= total_pages:
                                 logging.info(f'Page {page}/{total_pages if page > 1 else ""}')
                                 total_pgs, finished = self.scrape_pararius(city, post_type, property_type, page)
-                                if total_pages:
+                                logging.info(f'Length of dataframe: {len(self.properties)}')
+                                if total_pgs:
                                     total_pages = total_pgs
                                 page += 1
                                 if overall_page_counter > 25:
@@ -419,10 +418,11 @@ class Scraper():
                                 page = 1
                                 total_pages = 100 # placeholder
                                 finished = False
-                                while not finished:
+                                while not finished or page <= total_pages:
                                     logging.info(f'Page {page}/{total_pages if page > 1 else ""}')
                                     total_pgs, finished = self.scrape_funda(city, post_type, property_type, num_rooms, page, scrape_unavailable)
-                                    if total_pages:
+                                    logging.info(f'Length of dataframe: {len(self.properties)}')
+                                    if total_pgs:
                                         total_pages = total_pgs
                                     page += 1
                                     if overall_page_counter > 25:
