@@ -413,6 +413,8 @@ class Scraper():
                         if site == 'funda':
                             for num_rooms in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]:
                                 logging.info(f'Running: {site} | {post_type} | {property_type} | {city} | Room filter: {num_rooms}')
+                                page = 1
+                                total_pages = 100 # placeholder
                                 finished = False
                                 while not finished:
                                     total_pgs, finished = self.scrape_funda(city, post_type, property_type, num_rooms, page, scrape_unavailable)
