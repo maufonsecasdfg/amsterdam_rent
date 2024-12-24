@@ -35,6 +35,7 @@ class Scraper():
         del self.properties
         gc.collect()
         self.properties = pd.DataFrame()
+        logging.info(f'Property DataFrame has been reset.')
         
     def process_price(self, price_text):
         try:
@@ -75,7 +76,6 @@ class Scraper():
         tries = 0
         err = None
         while tries <= max_tries:
-            logging.info(f'Page: {page}')
             headers = self.generate_headers()
             try:
                 response = httpx.get(base_url, headers=headers, follow_redirects=True)
@@ -243,7 +243,6 @@ class Scraper():
         err = None
         total_pages = None
         while tries <= max_tries:
-            logging.info(f'Page: {page}')
             try:
                 url = base_url + f'&search_result={page}'
                 driver.get(url)
@@ -409,7 +408,11 @@ class Scraper():
                                 if total_pages:
                                     total_pages = total_pgs
                                 page += 1
-                                overall_page_counter += 1
+                                if overall_page_counter > 25:
+                                    self.update_bigquery_table()
+                                    overall_page_counter = 0
+                                else:
+                                    overall_page_counter += 1
                         if site == 'funda':
                             for num_rooms in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]:
                                 logging.info(f'Running: {site} | {post_type} | {property_type} | {city} | Room filter: {num_rooms}')
@@ -417,11 +420,12 @@ class Scraper():
                                 total_pages = 100 # placeholder
                                 finished = False
                                 while not finished:
+                                    logging.info(f'Page {page}/{total_pages if page > 1 else ""}')
                                     total_pgs, finished = self.scrape_funda(city, post_type, property_type, num_rooms, page, scrape_unavailable)
                                     if total_pages:
                                         total_pages = total_pgs
                                     page += 1
-                                    if overall_page_counter == 40:
+                                    if overall_page_counter > 25:
                                         self.update_bigquery_table()
                                         overall_page_counter = 0
                                     else:
@@ -489,6 +493,8 @@ class Scraper():
         job.result()
 
         client.delete_table(tmp_table_id, not_found_ok=True)
+        logging.info(f'{property_table_id} UPDATED IN BIGQUERY')
+        
         self.reset_property_table()
 
     def generate_headers(self, only_user_agent=False):
