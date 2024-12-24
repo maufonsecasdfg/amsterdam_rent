@@ -242,8 +242,8 @@ class Scraper():
         total_pages = None
         while tries <= max_tries:
             try:
-                url = base_url + f'&search_result={page}'
-                driver.get(url)
+                logging.info(f'URL: {base_url}')
+                driver.get(base_url)
                 driver.execute_script("return document.readyState == 'complete'")
                 time.sleep(5)
                 
