@@ -389,8 +389,11 @@ class Scraper():
             else:
                 return None, False
         else:
-            logging.info('Page not loaded properly. Retrying')
-            return self.scrape_funda(city, post_type, property_type, num_rooms, page, scrape_unavailable)
+            if page == 1:
+                return None, True
+            else:
+                logging.info('Page not loaded properly. Retrying')
+                return self.scrape_funda(city, post_type, property_type, num_rooms, page, scrape_unavailable)
 
     def run(self, cities, sites, post_types, property_types, scrape_unavailable=False):
         overall_page_counter = 0 
