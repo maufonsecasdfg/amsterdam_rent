@@ -248,19 +248,22 @@ class Scraper():
                 time.sleep(5)
                 
                 if page == 1:
-                    pagination = WebDriverWait(driver, 10).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, 'ul.pagination'))
-                    )
-                    pagination_html = pagination.get_attribute('innerHTML')
-                    soup = BeautifulSoup(pagination_html, 'html.parser')
-                    
-                    page_numbers = []
-                    for li in soup.find_all('li'):
-                        a_tag = li.find('a')
-                        if a_tag and a_tag.text.strip().isdigit():
-                            page_numbers.append(int(a_tag.text.strip()))
-                    
-                    total_pages = max(page_numbers) if page_numbers else 1
+                    try:
+                        pagination = WebDriverWait(driver, 45).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, 'ul.pagination'))
+                        )
+                        pagination_html = pagination.get_attribute('innerHTML')
+                        soup = BeautifulSoup(pagination_html, 'html.parser')
+                        
+                        page_numbers = []
+                        for li in soup.find_all('li'):
+                            a_tag = li.find('a')
+                            if a_tag and a_tag.text.strip().isdigit():
+                                page_numbers.append(int(a_tag.text.strip()))
+                        
+                        total_pages = max(page_numbers) if page_numbers else 1
+                    except:
+                        total_pages = 1
                 break                
                 
             except httpx.TimeoutException as errt:
@@ -431,6 +434,8 @@ class Scraper():
                                         overall_page_counter = 0
                                     else:
                                         overall_page_counter += 1
+                            if len(self.properties) > 0:
+                                self.update_bigquery_table()
 
         
     def update_bigquery_table(self):
