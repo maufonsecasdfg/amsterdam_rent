@@ -406,13 +406,25 @@ class Scraper():
                             page = 1
                             total_pages = 100 # placeholder
                             finished = False
+                            tries = 0
                             while not finished and page <= total_pages:
                                 logging.info(f'Page {page}/{total_pages if page > 1 else ""}')
-                                total_pgs, finished = self.scrape_pararius(city, post_type, property_type, page)
+                                try:
+                                    total_pgs, finished = self.scrape_pararius(city, post_type, property_type, page)
+                                except:
+                                    if tries < 5:
+                                        total_pgs, finished = None, False
+                                        logging.info(f'Scraping page {page} failed, retrying...')
+                                        tries += 1
+                                    else:
+                                        total_pgs, finished = None, True
+                                        logging.info(f'Scraping page {page} failed, continuing')
+                                        tries = 0
                                 logging.info(f'Length of dataframe: {len(self.properties)}')
                                 if total_pgs:
                                     total_pages = total_pgs
                                 page += 1
+                                tries = 0
                                 if overall_page_counter >= 15:
                                     self.update_bigquery_table()
                                     overall_page_counter = 0
@@ -426,9 +438,18 @@ class Scraper():
                                 finished = False
                                 while not finished and page <= total_pages:
                                     logging.info(f'Page {page}/{total_pages if page > 1 else ""}')
-                                    total_pgs, finished = self.scrape_funda(city, post_type, property_type, num_rooms, page, scrape_unavailable)
+                                    try:
+                                        total_pgs, finished = self.scrape_funda(city, post_type, property_type, num_rooms, page, scrape_unavailable)
+                                    except:
+                                        if tries < 5:
+                                            total_pgs, finished = None, False
+                                            logging.info(f'Scraping page {page} failed, retrying...')
+                                            tries += 1
+                                        else:
+                                            total_pgs, finished = None, True
+                                            logging.info(f'Scraping page {page} failed, continuing')
+                                            tries = 0
                                     logging.info(f'Length of dataframe: {len(self.properties)}')
-                                    logging.info("\n%s", self.properties.tail().to_string())
                                     if total_pgs:
                                         total_pages = total_pgs
                                     page += 1

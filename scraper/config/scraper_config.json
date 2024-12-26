@@ -3,5 +3,5 @@
     "sites": ["funda", "pararius"],
     "post_types": ["Buy", "Rent"],
     "property_types": ["Apartment", "House"],
-    "scrape_unavailable": true
+    "scrape_unavailable": false
 }
