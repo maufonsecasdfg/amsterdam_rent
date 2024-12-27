@@ -69,33 +69,34 @@ def compute_statistics(df, column_name, post_type, property_type, furnished, reg
     df_s = df.copy()
 
     for region in df[region_resolution].unique():
-        print('region', region)
         if region_resolution == 'stadsdeel':
             stadsdeel = region
             subdivision = None
             wijk = None
+            wijk_code = None
             buurt = None
+            buurt_code = None
         elif region_resolution == 'stadsdeel_onderverdeling':
             stadsdeel = df_s[df_s['stadsdeel_onderverdeling']==region]['stadsdeel'].iloc[0]
             subdivision = region
             wijk = None
+            wijk_code = None
             buurt = None
+            buurt_code = None
         elif region_resolution == 'wijk':
             stadsdeel = df_s[df_s['wijk']==region]['stadsdeel'].iloc[0]
             subdivision = df_s[df_s['wijk']==region]['stadsdeel_onderverdeling'].iloc[0]
             wijk = region
+            wijk_code = df_s[df_s['wijk']==region]['wijk_code'].iloc[0]
             buurt = None
+            buurt_code = None
         elif region_resolution == 'buurt':
             stadsdeel = df_s[df_s['buurt']==region]['stadsdeel'].iloc[0]
             subdivision = df_s[df_s['buurt']==region]['stadsdeel_onderverdeling'].iloc[0]
             wijk = df_s[df_s['buurt']==region]['wijk'].iloc[0]
+            wijk_code = df_s[df_s['buurt']==region]['wijk_code'].iloc[0]
             buurt = region
-            
-        print(stadsdeel)
-        print(subdivision)
-        print(wijk)
-        print(buurt)
-        print('')
+            buurt_code = df_s[df_s['buurt']==region]['buurt_code'].iloc[0]
 
         df_r = df_s[df_s[region_resolution]==region].copy()
         df_r[f'log_{column_name}'] = np.log(df_r[column_name])
@@ -115,7 +116,9 @@ def compute_statistics(df, column_name, post_type, property_type, furnished, reg
                 'stadsdeel': stadsdeel,
                 'subdivision': subdivision,
                 'wijk': wijk,
+                'wijk_code': wijk_code,
                 'buurt': buurt,
+                'buurt_code': buurt_code,
                 'post_type': post_type,
                 'property_type': property_type,
                 'furnished': furnished,
@@ -147,7 +150,9 @@ def compute_statistics(df, column_name, post_type, property_type, furnished, reg
             'stadsdeel': stadsdeel,
             'subdivision': subdivision,
             'wijk': wijk,
+            'wijk_code': wijk_code,
             'buurt': buurt,
+            'buurt_code': buurt_code,
             'post_type': post_type,
             'property_type': property_type,
             'furnished': furnished,
@@ -201,6 +206,10 @@ def upload_dataframe_to_bigquery(df, bigquery_config):
         bigquery.SchemaField("region_resolution", "STRING"),
         bigquery.SchemaField("stadsdeel", "STRING"),
         bigquery.SchemaField("subdivision", "STRING"),
+        bigquery.SchemaField("wijk", "STRING"),
+        bigquery.SchemaField("wijk_code", "STRING"),
+        bigquery.SchemaField("buurt", "STRING"),
+        bigquery.SchemaField("buurt_code", "STRING"),
         bigquery.SchemaField("post_type", "STRING"),
         bigquery.SchemaField("property_type", "STRING"),
         bigquery.SchemaField("furnished", "STRING"),
