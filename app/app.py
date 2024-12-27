@@ -35,7 +35,10 @@ def index():
     metric = request.args.get('metric', 'geometric_mean')
     confidence_interval = request.args.get('confidence_interval', 75)
     
-    region_resolution_column = 'stadsdeel' if region_resolution == 'stadsdeel' else 'stadsdeel_onderverdeling'
+    if region_resolution == 'subdivision':
+        region_resolution_column = 'stadsdeel_onderverdeling'
+    else:
+        region_resolution_column = region_resolution
     
     if not region_resolution:
         region_resolution = 'stadsdeel'
@@ -58,6 +61,8 @@ def index():
         s.region_resolution as region_resolution, 
         s.stadsdeel as stadsdeel, 
         s.subdivision as subdivision,
+        s.wijk as wijk,
+        s.buurt as buurt,
         s.geometric_mean as geometric_mean, 
         s.geometric_std as geometric_std, 
         s.geometric_conf_int_{confidence_interval}_low as geometric_conf_int_{confidence_interval}_low,  
@@ -71,6 +76,8 @@ def index():
         s.region_resolution as region_resolution, 
         s.stadsdeel as stadsdeel, 
         s.subdivision as subdivision,
+        s.wijk as wijk,
+        s.buurt as buurt,
         s.median as median, 
         s.q1 as q1, 
         s.q3 as q3, 
@@ -84,6 +91,8 @@ def index():
         s.region_resolution as region_resolution, 
         s.stadsdeel as stadsdeel, 
         s.subdivision as subdivision,
+        s.wijk as wijk,
+        s.buurt as buurt,
         s.mode as mode, 
         s.number_of_properties as number_of_properties,
         g.geometry as geometry
@@ -96,11 +105,15 @@ def index():
     {select}
     FROM `{bigquery_config['project_id']}.{bigquery_config['dataset_id']}.stats` s
     LEFT JOIN `{bigquery_config['project_id']}.{bigquery_config['dataset_id']}.geodata_{region_resolution_column}` g
-    ON s.{region_resolution} = g.{region_resolution_column}
-    WHERE 1=1
     """
+    
+    if region_resolution in ['wijk', 'buurt']:
+        query += f" ON s.{region_resolution}_code = g.{region_resolution_column}_code"
+    else:
+        query += f" ON s.{region_resolution} = g.{region_resolution_column}"
 
     # Add conditions based on filters
+    query += " WHERE 1=1"
     query += f" AND region_resolution = '{region_resolution_column}'"
     query += f" AND post_type = '{post_type}'"
     query += f" AND property_type = '{property_type}'"
@@ -119,7 +132,7 @@ def index():
     # Initialize map
     m = folium.Map(location=folium_config['location'], zoom_start=folium_config['zoom_start'], tiles=folium_config['tiles'])
     
-    colormap = cm.LinearColormap(["yellow", "orange", "red"], vmin=gdf[metric].min(), vmax=gdf[metric].max())
+    colormap = cm.LinearColormap(["blue", "green", "yellow", "orange", "red"], vmin=gdf[metric].min(), vmax=gdf[metric].max())
     metirc_dict = gdf.set_index(region_resolution)[metric].fillna(0)
     
     def style_function(feature):
@@ -140,6 +153,18 @@ def index():
     if region_resolution == 'subdivision':
         fields += ['subdivision']
         aliases += ['Subdivision:']
+    if region_resolution == 'wijk':
+        fields += ['subdivision']
+        aliases += ['Subdivision:']
+        fields += ['wijk']
+        aliases += ['Wijk:']
+    if region_resolution == 'buurt':
+        fields += ['subdivision']
+        aliases += ['Subdivision:']
+        fields += ['wijk']
+        aliases += ['Wijk:']
+        fields += ['buurt']
+        aliases += ['Buurt:']
     fields += [metric]
     if metric == 'geometric_mean':
         aliases += ['Mean:']
@@ -170,7 +195,7 @@ def index():
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <title>Amsterdam Real Estate Visualizer</title>
+        <title>Amsterdam Housing Market Visualizer</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Bootstrap CSS (CDN) -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -188,7 +213,7 @@ def index():
     </head>
     <body>
         <div class="container">
-            <h1 class="my-4">Map Visualization</h1>
+            <h1 class="my-4">Amsterdam Housing Market</h1>
             <form method="get" action="/" class="filter-form">
                 <div class="row">
                     <!-- Region Resolution (Radio) -->
@@ -201,6 +226,14 @@ def index():
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="region_resolution" id="subdivision" value="subdivision" {"checked" if region_resolution=="subdivision" else ""}>
                             <label class="form-check-label" for="subdivision">Stadsdeel Subdivision</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="region_resolution" id="wijk" value="wijk" {"checked" if region_resolution=="wijk" else ""}>
+                            <label class="form-check-label" for="wijk">Wijk</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="region_resolution" id="buurt" value="buurt" {"checked" if region_resolution=="buurt" else ""}>
+                            <label class="form-check-label" for="buurt">Buurt</label>
                         </div>
                     </div>
                     
