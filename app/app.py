@@ -231,10 +231,6 @@ def index():
                             <input class="form-check-input" type="radio" name="region_resolution" id="wijk" value="wijk" {"checked" if region_resolution=="wijk" else ""}>
                             <label class="form-check-label" for="wijk">Wijk</label>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="region_resolution" id="buurt" value="buurt" {"checked" if region_resolution=="buurt" else ""}>
-                            <label class="form-check-label" for="buurt">Buurt</label>
-                        </div>
                     </div>
                     
                     <!-- Post Type (Radio) -->
