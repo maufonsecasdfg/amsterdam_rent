@@ -522,7 +522,7 @@ class Scraper():
         job = client.query(query)
         job.result()
 
-        #client.delete_table(tmp_table_id, not_found_ok=True)
+        client.delete_table(tmp_table_id, not_found_ok=True)
         logging.info(f'{property_table_id} UPDATED IN BIGQUERY')
         
         self.reset_property_table()
