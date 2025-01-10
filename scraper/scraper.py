@@ -467,10 +467,13 @@ class Scraper():
         
     def update_bigquery_table(self):
         self.properties = self.properties.drop_duplicates(subset=['url', 'post_type'])
-        self.properties = self.properties.dropna(subset=['price', 'surface', 'rooms'])
-        self.properties['price'] = self.properties['price'].astype(int)
-        self.properties['surface'] = self.properties['surface'].astype(int)
-        self.properties['rooms'] = self.properties['rooms'].astype(int)
+        try:
+            self.properties = self.properties.dropna(subset=['price', 'surface', 'rooms'])
+            self.properties['price'] = self.properties['price'].astype(int)
+            self.properties['surface'] = self.properties['surface'].astype(int)
+            self.properties['rooms'] = self.properties['rooms'].astype(int)
+        except:
+            return None
         
         client = bigquery.Client()
         tmp_table_id = f"{bigquery_config['project_id']}.{bigquery_config['dataset_id']}.tmp_property"
