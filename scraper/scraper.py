@@ -14,10 +14,12 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 from google.cloud import bigquery
 from zoneinfo import ZoneInfo
 import time
 import gc
+import sys
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -244,24 +246,35 @@ class Scraper():
             try:
                 logging.info(f'URL: {base_url}')
                 driver.get(base_url)
+                driver.set_page_load_timeout(60)
                 driver.execute_script("return document.readyState == 'complete'")
                 time.sleep(5)
+                
+                try:
+                    cookie_accept_button = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.ID, "didomi-notice-agree-button"))
+                    )
+                    cookie_accept_button.click()
+                    print("Cookies accepted.")
+                except Exception as e:
+                    print("Cookie banner not found or already handled.", e)
                 
                 if page == 1:
                     try:
                         pagination = WebDriverWait(driver, 45).until(
-                            EC.presence_of_element_located((By.CSS_SELECTOR, 'ul.pagination'))
+                            EC.presence_of_element_located((By.CSS_SELECTOR, 'ul.my-5.flex.items-center'))
                         )
                         pagination_html = pagination.get_attribute('innerHTML')
                         soup = BeautifulSoup(pagination_html, 'html.parser')
-                        
+
                         page_numbers = []
                         for li in soup.find_all('li'):
                             a_tag = li.find('a')
                             if a_tag and a_tag.text.strip().isdigit():
                                 page_numbers.append(int(a_tag.text.strip()))
-                        
+
                         total_pages = max(page_numbers) if page_numbers else 1
+                        print(f"Total pages: {total_pages}")
                     except:
                         total_pages = 1
                 break                
@@ -285,98 +298,106 @@ class Scraper():
             else:
                 logging.info(f'Tries exceeded with error: {err}')
                 return None, True
-            
-        listings = driver.find_elements(By.XPATH, '//div[@data-test-id="search-result-item"]')
+        
+        
+        listings = driver.find_elements(By.CSS_SELECTOR, 'div.border-b.pb-3')
 
-        if len(listings) != 0:
-            data = {'page_source': [],
-                    'scrape_date': [],
-                    'post_type': [],
-                    'city': [],
-                    'location': [],
-                    'postcode': [],
-                    'title': [],
-                    'property_type': [],
-                    'price': [],
-                    'price_type': [],
-                    'surface': [],
-                    'surface_unit': [],
-                    'rooms': [],
-                    'bedrooms': [],
-                    'furnished': [],
-                    'url': [],
-                    'status': []
-                }
+        if listings:
+            data = {
+                'page_source': [], 'scrape_date': [], 'post_type': [], 'city': [],
+                'location': [], 'postcode': [], 'title': [], 'property_type': [],
+                'price': [], 'price_type': [], 'surface': [], 'surface_unit': [],
+                'rooms': [], 'bedrooms': [], 'furnished': [], 'url': [], 'status': []
+            }
+
             for listing in listings:
                 inner_html = listing.get_attribute('innerHTML')
                 soup = BeautifulSoup(inner_html, 'html.parser')
 
-                title = soup.find('h2', {'data-test-id': 'street-name-house-number'})
-                title = title.text.replace('\n', '').strip() if title else None
-                
-                postcode = soup.find('div', {'data-test-id': 'postal-code-city'})
-                postcode = ' '.join(postcode.text.strip().split(' ')[:2]).strip() if postcode else None
-                
-                if post_type == 'Buy':
-                    price_section = soup.find('p', {'data-test-id': 'price-sale'})
-                elif post_type == 'Rent':
-                    price_section = soup.find('p', {'data-test-id': 'price-rent'})
+                link_tag = soup.select_one('a[data-testid="listingDetailsAddress"]')
+                if link_tag:
+                    title_span = link_tag.select_one('.flex.font-semibold span.truncate')
+                    title = title_span.get_text(strip=True) if title_span else None
+
+                    relative_url = link_tag.get('href', '').strip()
+                    link = f"https://www.funda.nl{relative_url}" if relative_url else None
+                else:
+                    title = None
+                    link = None
+
+                address_meta = soup.select_one('a[data-testid="listingDetailsAddress"] div.truncate.text-neutral-80')
+                postcode, city_name = None, None
+                if address_meta:
+                    address_text = address_meta.get_text(strip=True)
+                    parts = address_text.split(None, 1) 
+                    if len(parts) == 2:
+                        postcode = parts[0]
+                        city_name = parts[1]
+                    else:
+                        postcode = address_text
+                    postcode = postcode[:4] + ' ' + postcode[4:]
+
+                price_section = soup.select_one('div.font-semibold.mt-2.mb-0 div.truncate')
                 if not price_section:
                     continue
-                price, price_type = self.process_price(price_section.text)
+                
+                raw_price_text = price_section.get_text(strip=True)
+                price, price_type = self.process_price(raw_price_text)
                 if price_type:
                     price_type = price_type.replace('/maand', 'per month')
                 if not price:
-                    continue              
+                    continue
                 
-                surface = []
+                surfaces = []
                 bedrooms = None
-                for e in soup.select('ul.mt-1 li'):
-                    text = e.text.strip()
-                    if 'm²' in text:
+                
+                detail_spans = soup.select('ul.flex.h-8.flex-wrap.gap-4.overflow-hidden.truncate.py-1 li.flex.items-center span')
+                for span in detail_spans:
+                    text = span.get_text(strip=True)
+                    if text.endswith('m²'):
                         try:
-                            surface.append(int(text.split(' ')[0]))
+                            surfaces.append(int(text.split()[0]))
                         except ValueError:
-                            continue
-                    else:
+                            pass
+                    elif text.isdigit():
                         try:
-                            if not bedrooms:
+                            if bedrooms is None:
                                 bedrooms = int(text)
                         except ValueError:
-                            continue
-                surface = max(surface) if surface else None
+                            pass
                 
-                
-                link_element = soup.find('a', {'data-test-id': 'object-image-link'})
-                link = link_element['href'] if link_element else None
-                if not link:
-                    continue                     
-                
-                status_element = soup.find('li', {'class': 'mb-1 mr-1 rounded-sm px-1 py-0.5 text-xs font-semibold bg-red-50 text-white'})
-                if not status_element:
-                    status = 'Available'
-                elif status_element.text.replace('\n','').strip() in ['Verkocht', 'Verhuurd']:
-                    status = 'Unavailable'
-                else:
-                    status = 'In negotiations'
+                surface = max(surfaces) if surfaces else None
+
+                status_div = soup.select_one('div.absolute.left-2.top-1')
+                status = "Available"
+
+                if status_div:
+                    tag_texts = [span.get_text(strip=True).lower() for span in status_div.find_all('span')]
                     
+                    if any("verkocht" in txt for txt in tag_texts):
+                        status = "Unavailable"
+                    elif any("onder bod" in txt for txt in tag_texts):
+                        status = "In negotiations"
+        
+
+                # Append to data dictionary
                 data['page_source'].append('Funda')
                 data['scrape_date'].append(date.today())
-                data['city'].append(city.capitalize())
                 data['post_type'].append(post_type)
-                data['rooms'].append(num_rooms)
-                data['property_type'].append(property_type)
+                data['city'].append(city.capitalize() if city else 'Unknown')
                 data['location'].append(None)
-                data['furnished'].append(None)
-                data['title'].append(title)
                 data['postcode'].append(postcode)
+                data['title'].append(title)
+                data['property_type'].append(property_type) 
                 data['price'].append(price)
-                data['price_type'].append(price_type)                            
+                data['price_type'].append(price_type)
                 data['surface'].append(surface)
                 data['surface_unit'].append('m²')
+                data['rooms'].append(num_rooms)
                 data['bedrooms'].append(bedrooms)
+                data['furnished'].append(None) 
                 data['url'].append(link)
-                data['status'].append(status)     
+                data['status'].append(status)
                                                 
             driver.quit()
 
