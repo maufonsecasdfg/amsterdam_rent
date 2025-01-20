@@ -13,12 +13,12 @@ with open('config/scraper_config.json', 'r') as f:
 with open('config/bigquery_config.json', 'r') as f:
     bigquery_config = json.load(f)
 
+client = bigquery.Client()
 logging.info("Starting scraper...")
 try:
     s = Scraper()
     s.run(**scraper_config)
 
-    client = bigquery.Client()
     property_table_id = f"{bigquery_config['project_id']}.{bigquery_config['dataset_id']}.property"
     current_date = datetime.now(tz=ZoneInfo("Europe/Amsterdam")).strftime('%Y-%m-%d')
     
@@ -71,6 +71,11 @@ to_remove = list(df[(df['cleaned_title_1'] == df['cleaned_title_2'])]['url_1'].v
 df_to_remove = pd.DataFrame({'url': to_remove})
 
 temp_table_id = f"{bigquery_config['project_id']}.{bigquery_config['dataset_id']}.temp_urls_to_remove"
+temp_schema = [
+    bigquery.SchemaField("url", "STRING", mode="REQUIRED"),
+]
+table = bigquery.Table(temp_table_id, schema=temp_schema)
+table = client.create_table(table, exists_ok=True)
 job = client.load_table_from_dataframe(df_to_remove, temp_table_id)
 job.result()
 
